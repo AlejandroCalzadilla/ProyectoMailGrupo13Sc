@@ -96,7 +96,7 @@ public class ClienteM {
         cliente.setTelefono(rs.getString("phone_number"));
         cliente.setGenero(rs.getString("gender"));
         cliente.setFechaNacimiento(rs.getDate("birthdate"));
-        cliente.setIdUsuario(rs.getInt("id_user"));
+        cliente.setIdUsuario(rs.getInt("user_id"));
         cliente.setCreadoEn(rs.getTimestamp("created_at"));
         cliente.setActualizadoEn(rs.getTimestamp("updated_at"));
         clientes.add(cliente);
@@ -121,7 +121,7 @@ public class ClienteM {
         telefono = rs.getString("phone_number");
         genero = rs.getString("gender");
         fechaNacimiento = rs.getDate("birthdate");
-        idUsuario = rs.getInt("id_user");
+        idUsuario = rs.getInt("user_id");
         creadoEn = rs.getTimestamp("created_at");
         actualizadoEn = rs.getTimestamp("updated_at");
         return true;
