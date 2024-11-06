@@ -34,7 +34,10 @@ public class ServicioEmail {
         clientePOP = new ClientePOP();
         clientePOP.conectar();
         int totalCorreos = clientePOP.obtenerTotalDeCorreos();
-        System.out.println("S : Total de correos: " + totalCorreos);
+        for (int i = 1; i <= 5; i++) {
+            String correo = clientePOP.obtenerCorreo(i);
+            System.out.println("Correo " + i + ": " + correo);
+        }
         clientePOP.desconectar();
     }
 
@@ -58,6 +61,15 @@ public class ServicioEmail {
         System.out.println("S : El cliente POP se ha detenido automáticamente.");
     }
 
+    public static String extraerMessageId(String correo) {
+        for (String line : correo.split("\n")) {
+            if (line.startsWith("Message-ID:")) {
+                return line.substring(11).trim();
+            }
+        }
+        return null;
+    }
+
     public static void main(String[] args) throws IOException {
         ServicioEmail servicioEmail = new ServicioEmail();
         servicioEmail.iniciarClientePOP();
@@ -66,7 +78,7 @@ public class ServicioEmail {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.schedule(servicioEmail::detener, 25, TimeUnit.SECONDS);
 
-        while (servicioEmail.conectado) {
+       /* while (servicioEmail.conectado) {
             servicioEmail.revisarCorreos();
 
             try {
@@ -74,10 +86,10 @@ public class ServicioEmail {
             } catch (InterruptedException e) {
                 System.out.println("Interrupción en el ciclo de revisión: " + e.getMessage());
             }
-        }
+        }*/
 
         // Desconectar antes de salir
-        servicioEmail.desconectar();
+        //servicioEmail.desconectar();
         scheduler.shutdown();
     }
 }

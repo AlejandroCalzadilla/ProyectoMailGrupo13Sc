@@ -145,4 +145,13 @@ public class ClientePOP {
             System.out.println("Error al revisar correos: " + e.getMessage());
         }
     }
+
+    public String obtenerCorreo(int i) {
+        try {
+            return enviarComando(salida, entrada, "RETR " + i + "\r\n");
+        } catch (IOException e) {
+            System.out.println("Error al obtener el correo: " + e.getMessage());
+            return null;
+        }
+    }
 }
