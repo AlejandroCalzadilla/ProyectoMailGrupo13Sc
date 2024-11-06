@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EspecieM {
+public class EspeciesM {
 
     private int id;
     private String nombre;
@@ -48,7 +48,7 @@ public class EspecieM {
     }
 
 
-    public EspecieM() throws SQLException {
+    public EspeciesM() throws SQLException {
 
         conexion= conexion.getInstancia();
         conn=conexion.getConnection();
@@ -68,13 +68,13 @@ public class EspecieM {
         }
     }
 
-    public List<EspecieM> obtenerEspecies() {
-        List<EspecieM> especies = new ArrayList<>();
+    public List<EspeciesM> obtenerEspecies() {
+        List<EspeciesM> especies = new ArrayList<>();
         String sql = "SELECT * FROM species";
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                EspecieM especie = new EspecieM();
+                EspeciesM especie = new EspeciesM();
                 especie.setId(rs.getInt("id"));
                 especie.setNombre(rs.getString("name"));
                 especie.setCreadoEn(rs.getTimestamp("created_at"));
@@ -88,14 +88,14 @@ public class EspecieM {
     }
 
 
-    public EspecieM leerEspecie(int id) {
+    public EspeciesM leerEspecie(int id) {
         String sql = "SELECT * FROM species WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 // Creamos un nuevo objeto EspecieM
-                EspecieM especie = new EspecieM();
+                EspeciesM especie = new EspeciesM();
                 especie.setId(rs.getInt("id"));
                 especie.setNombre(rs.getString("name"));
                 especie.setCreadoEn(rs.getTimestamp("created_at"));

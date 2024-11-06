@@ -142,22 +142,6 @@ public class ClientesN {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public List<ClientesN> mapear(List<ClienteM> clientesM) throws SQLException {
         List<ClientesN> clientesN = new ArrayList<>();
 
@@ -228,8 +212,4 @@ public class ClientesN {
             throw new IllegalArgumentException("El ID de usuario debe ser mayor que 0");
         }
     }
-
-
-
-
 }

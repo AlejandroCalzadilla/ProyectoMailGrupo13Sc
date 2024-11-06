@@ -2,20 +2,19 @@ package org.mailgrupo13;
 
 import org.mailgrupo13.sistema.modelo.CategoriasM;
 import org.mailgrupo13.sistema.modelo.ClienteM;
-import org.mailgrupo13.sistema.modelo.EspecieM;
+import org.mailgrupo13.sistema.modelo.EspeciesM;
 import org.mailgrupo13.sistema.modelo.MedicamentosM;
 
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
 
         ClienteM cliente = new ClienteM();
-        EspecieM especie = new EspecieM();
+        EspeciesM especie = new EspeciesM();
         especie.setNombre("ave");
         especie.setCreadoEn(Timestamp.valueOf(LocalDateTime.now()));
         especie.setActualizadoEn(Timestamp.valueOf(LocalDateTime.now()));

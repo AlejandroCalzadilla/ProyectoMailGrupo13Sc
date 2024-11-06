@@ -1,7 +1,7 @@
 package org.mailgrupo13.sistema.negocio;
 
 import org.mailgrupo13.sistema.modelo.ClienteM;
-import org.mailgrupo13.sistema.modelo.EspecieM;
+import org.mailgrupo13.sistema.modelo.EspeciesM;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -14,7 +14,7 @@ public class EspeciesN {
     private String nombre;
     private Timestamp creadoEn;
     private Timestamp actualizadoEn;
-    EspecieM especieM;
+    EspeciesM especieM;
 
 
 
@@ -61,7 +61,7 @@ public class EspeciesN {
     public String agregarCliente(String nombre) throws SQLException {
         try {
             validarCampos(nombre);
-            EspecieM especieMObj = cargar(0, nombre);
+            EspeciesM especieMObj = cargar(0, nombre);
             return "Cliente agregado con éxito";
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
@@ -72,7 +72,7 @@ public class EspeciesN {
     public boolean actualizarEspecie(int id, String nombre) throws SQLException {
         try{
             validarCampos(nombre);
-            EspecieM clienteMObj=cargar(id,nombre);
+            EspeciesM clienteMObj=cargar(id,nombre);
             return clienteMObj.actualizarEspecie();
         }catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
@@ -104,10 +104,10 @@ public class EspeciesN {
 
 
 
-    public List<EspeciesN> mapear(List<EspecieM> especiesM) throws SQLException {
+    public List<EspeciesN> mapear(List<EspeciesM> especiesM) throws SQLException {
         List<EspeciesN> clientesN = new ArrayList<>();
 
-        for (EspecieM clienteM : especiesM) {
+        for (EspeciesM clienteM : especiesM) {
             EspeciesN especieN = new EspeciesN();
             especieN.setId(clienteM.getId());
             especieN.setNombre(clienteM.getNombre());
@@ -118,9 +118,9 @@ public class EspeciesN {
         return clientesN;
     }
 
-    public EspecieM cargar( int id,String nombre) throws SQLException {
+    public EspeciesM cargar(int id, String nombre) throws SQLException {
 
-        EspecieM especieMObj = new EspecieM();
+        EspeciesM especieMObj = new EspeciesM();
         especieMObj.setId(id);
         especieMObj.setNombre(nombre);
         especieMObj.setCreadoEn(Timestamp.valueOf(LocalDateTime.now()));
