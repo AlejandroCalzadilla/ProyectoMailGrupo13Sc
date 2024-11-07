@@ -94,16 +94,6 @@ public class EspeciesN {
 
 
 
-
-
-
-
-
-
-
-
-
-
     public List<EspeciesN> mapear(List<EspeciesM> especiesM) throws SQLException {
         List<EspeciesN> clientesN = new ArrayList<>();
 

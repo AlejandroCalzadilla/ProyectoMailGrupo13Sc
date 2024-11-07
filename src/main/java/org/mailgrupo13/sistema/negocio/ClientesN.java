@@ -193,12 +193,10 @@ public class ClientesN {
     }
 
     private void validarCampos(String nombre, String apellido, String telefono, String genero, String fechanaciemiento, int idUsuario) {
-        if (nombre == null || nombre.isEmpty()) {
+        if (nombre == null || nombre.isEmpty())
             throw new IllegalArgumentException("El nombre no puede estar vacío");
-        }
-        if (apellido == null || apellido.isEmpty()) {
+        if (apellido == null || apellido.isEmpty())
             throw new IllegalArgumentException("El apellido no puede estar vacío");
-        }
         if (telefono == null || telefono.isEmpty()) {
             throw new IllegalArgumentException("El teléfono no puede estar vacío");
         }
@@ -211,5 +209,11 @@ public class ClientesN {
         if (idUsuario <= 0) {
             throw new IllegalArgumentException("El ID de usuario debe ser mayor que 0");
         }
+        if(nombre.length()<3 )
+            throw new IllegalArgumentException("El nombre es muy corto");
+
+        if(apellido.length()<3)
+            throw new IllegalArgumentException("El apellido es muy corto");
+
     }
 }
