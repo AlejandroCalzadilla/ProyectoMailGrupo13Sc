@@ -12,12 +12,6 @@ public class ClienteSMTP {
     private static final int PUERTO = 25;
     private static final String EMISOR = "grupo13sc@tecnoweb.org.bo";
 
-    public static void main(String[] args) {
-        String usuarioReceptor = "grupo13sc@tecnoweb.org.bo";
-
-        enviarCorreo(usuarioReceptor, "Probando", "Mesagge for demo.");
-    }
-
     private static void enviarComando(DataOutputStream salida, BufferedReader entrada, String comando) throws IOException {
         salida.writeBytes(comando);
         String respuesta = leerRespuesta(entrada);
@@ -41,7 +35,7 @@ public class ClienteSMTP {
         return lines.toString();
     }
 
-    public static void enviarCorreo(String usuarioReceptor, String subject, String mensaje) {
+    public void enviarCorreo(String usuarioReceptor, String subject, String mensaje) {
         try (Socket socket = new Socket(SERVIDOR, PUERTO);
              BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              DataOutputStream salida = new DataOutputStream(socket.getOutputStream())) {

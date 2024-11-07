@@ -22,7 +22,6 @@ public class ClientePOP {
     private Socket socket;
     private BufferedReader entrada;
     private DataOutputStream salida;
-    private boolean conectado = true;
 
     public void conectar() throws IOException {
         socket = new Socket(HOST, PORT);
@@ -40,9 +39,8 @@ public class ClientePOP {
         String response;
         if (comando.startsWith("RETR") || comando.startsWith("LIST")) {
             response = leerRespuestaMultilinea(entrada);
-            System.out.println("S : " + response);
             if (comando.startsWith("RETR")) {
-                evaluarCorreo(response);
+                //evaluarCorreo(response);
             }
             return response;
         }
@@ -141,14 +139,26 @@ public class ClientePOP {
             String x;
             x = enviarComando(salida, entrada, "LIST\r\n");
             System.out.println(x);
+            desconectar();
         } catch (Exception e) {
             System.out.println("Error al revisar correos: " + e.getMessage());
         }
     }
 
-    public String obtenerCorreo(int i) {
+    public String obtenerCorreo(int posicion) {
         try {
-            return enviarComando(salida, entrada, "RETR " + i + "\r\n");
+            return enviarComando(salida, entrada, "RETR " + posicion + "\r\n");
+        } catch (IOException e) {
+            System.out.println("Error al obtener el correo: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public String obtenerCorreoYEliminar(int posicion) {
+        try {
+            String correo = enviarComando(salida, entrada, "RETR " + posicion + "\r\n");
+            enviarComando(salida, entrada, "DELE " + posicion + "\r\n");
+            return correo;
         } catch (IOException e) {
             System.out.println("Error al obtener el correo: " + e.getMessage());
             return null;
