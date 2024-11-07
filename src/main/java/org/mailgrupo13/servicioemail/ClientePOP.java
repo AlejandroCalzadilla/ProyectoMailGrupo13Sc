@@ -112,7 +112,7 @@ public class ClientePOP {
 
     public int obtenerTotalDeCorreos() throws IOException {
         String response = enviarComando(salida, entrada, "STAT\r\n");
-        response = response.substring(4, response.length() - 4);
+        response = response.substring(4, response.length());
         int i = 1;
         while (response.charAt(i) != ' ') {
             i++;
