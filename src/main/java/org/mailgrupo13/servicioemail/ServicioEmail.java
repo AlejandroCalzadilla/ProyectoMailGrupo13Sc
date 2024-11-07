@@ -1,6 +1,7 @@
 package org.mailgrupo13.servicioemail;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +19,7 @@ public class ServicioEmail {
         this.comandoEmail = new ComandoEmail();
     }
 
-    public void iniciarClientePOP() throws IOException {
+    public void revisarCorreos() throws IOException, SQLException {
         clientePOP.conectar();
         int totalCorreos = clientePOP.obtenerTotalDeCorreos();
         for (int i = 1; i <= totalCorreos; i++) {
@@ -60,15 +61,15 @@ public class ServicioEmail {
         return null;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException {
         ServicioEmail servicioEmail = new ServicioEmail();
-        servicioEmail.iniciarClientePOP();
+        servicioEmail.revisarCorreos();
 
         // Programar el apagado automático después de 15 segundos
         /*ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.schedule(servicioEmail::detener, 25, TimeUnit.SECONDS);
+        scheduler.schedule(servicioEmail::detener, 40, TimeUnit.SECONDS);
         while (servicioEmail.conectado) {
-            servicioEmail.clientePOP.revisarCorreos();
+            servicioEmail.revisarCorreos();
 
             try {
                 Thread.sleep(10000); // Esperar 10 segundos entre revisiones
@@ -79,7 +80,7 @@ public class ServicioEmail {
         scheduler.shutdown();*/
     }
 
-    private void evaluarYResponderCorreo(String correo) {
+    private void evaluarYResponderCorreo(String correo) throws SQLException {
         String subject = extraerSubject(correo);
         String remitente = extraerRemitente(correo);
         if (subject != null) {
@@ -91,7 +92,7 @@ public class ServicioEmail {
         }
     }
 
-    private static String extraerSubject(String correo) {
+    private String extraerSubject(String correo) {
         for (String line : correo.split("\n")) {
             if (line.startsWith("Subject:")) {
                 return line.substring(9).trim();
@@ -100,19 +101,8 @@ public class ServicioEmail {
         return null;
     }
 
-    public String procesarCorreo(String subject) {
-        String respuesta = comandoEmail.evaluarYEjecutar(subject);
-        return respuesta;
-    }
-
-    private static String evaluarSubject(String subject) {
-        String query = parsearQuery(subject);
-        String respuestaConsulta = "";
-        // Verificar el patrón en el subject
-        if (query != null && subject.contains("PATTERN")) {
-            respuestaConsulta = "Entro a ejecutar consulta";
-        }
-        return respuestaConsulta;
+    public String procesarCorreo(String subject) throws SQLException {
+        return comandoEmail.evaluarYEjecutar(subject);
     }
 
     private static String parsearQuery(String subject) {

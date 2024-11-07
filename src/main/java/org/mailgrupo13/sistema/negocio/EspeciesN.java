@@ -17,7 +17,6 @@ public class EspeciesN {
     EspeciesM especieM;
 
 
-
     public int getId() {
         return id;
     }
@@ -51,30 +50,30 @@ public class EspeciesN {
         this.actualizadoEn = actualizadoEn;
     }
 
-    ClienteM cliente;
-
     public EspeciesN() throws SQLException {
-        cliente = new ClienteM();
+        especieM = new EspeciesM();
     }
 
 
-    public String agregarCliente(String nombre) throws SQLException {
+    public String agregarEspecie(String nombre) throws SQLException {
         try {
             validarCampos(nombre);
-            EspeciesM especieMObj = cargar(0, nombre);
-            return "Cliente agregado con éxito";
+            especieM.setNombre(nombre);
+            especieM.setCreadoEn(Timestamp.valueOf(LocalDateTime.now()));
+            especieM.setActualizadoEn(Timestamp.valueOf(LocalDateTime.now()));
+            return especieM.crearEspecie() ? "Especie agregada correctamente" : "Error al agregar la especie";
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
-            return "Error al agregar el cliente "+ e;
+            return "Error al agregar el cliente " + e;
         }
     }
 
     public boolean actualizarEspecie(int id, String nombre) throws SQLException {
-        try{
+        try {
             validarCampos(nombre);
-            EspeciesM clienteMObj=cargar(id,nombre);
+            EspeciesM clienteMObj = cargar(id, nombre);
             return clienteMObj.actualizarEspecie();
-        }catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -85,24 +84,14 @@ public class EspeciesN {
         return especieM.eliminarEspecie(id);
     }
 
-
-
     public List<EspeciesN> obtenerEspecies() throws SQLException {
-        return  mapear(especieM.obtenerEspecies());
+        return mapear(especieM.obtenerEspecies());
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
+    @Override
+    public String toString() {
+        return nombre;
+    }
 
     public List<EspeciesN> mapear(List<EspeciesM> especiesM) throws SQLException {
         List<EspeciesN> clientesN = new ArrayList<>();
@@ -129,14 +118,10 @@ public class EspeciesN {
     }
 
 
-
     private void validarCampos(String nombre) {
         if (nombre == null || nombre.isEmpty()) {
             throw new IllegalArgumentException("El nombre no puede estar vacío");
         }
 
     }
-
-
-
 }

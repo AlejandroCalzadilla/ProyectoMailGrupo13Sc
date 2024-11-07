@@ -25,8 +25,6 @@ public class ClientesN {
     private Timestamp actualizadoEn;
     ClienteM clienteM;
 
-
-
     public int getId() {
         return id;
     }
@@ -99,14 +97,9 @@ public class ClientesN {
         this.actualizadoEn = actualizadoEn;
     }
 
-    ClienteM cliente;
-
     public ClientesN() throws SQLException {
-      cliente = new ClienteM();
+      clienteM = new ClienteM();
     }
-
-
-
 
     public List<ClientesN> obtenerClientes() throws SQLException {
         return  mapear(clienteM.obtenerClientes());

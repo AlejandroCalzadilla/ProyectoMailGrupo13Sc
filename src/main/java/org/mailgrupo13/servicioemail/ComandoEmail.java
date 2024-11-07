@@ -1,10 +1,14 @@
 package org.mailgrupo13.servicioemail;
 
+import org.mailgrupo13.sistema.negocio.ClientesN;
+import org.mailgrupo13.sistema.negocio.EspeciesN;
+
+import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ComandoEmail {
-    public String evaluarYEjecutar(String subject) {
+    public String evaluarYEjecutar(String subject) throws SQLException {
         String respuestaConsulta;
 
         // Definir patrones para cada operación CRUD
@@ -39,12 +43,43 @@ public class ComandoEmail {
     }
 
     // Métodos para ejecutar consultas CRUD simuladas
-    private String ejecutarConsultaListar(String entidad) {
-        return "Listado de " + entidad;
+    private String ejecutarConsultaListar(String entidad) throws SQLException {
+        String respuesta = "";
+        switch (entidad) {
+            case "CLIENTES" -> {
+                ClientesN clientesN = new ClientesN();
+                respuesta = clientesN.obtenerClientes().toString();
+            }
+            case "MEDICAMENTOS" -> respuesta = "Listado de productos";
+            case "ESPECIES" -> {
+                EspeciesN especiesN = new EspeciesN();
+                respuesta = especiesN.obtenerEspecies().toString();
+            }
+            default -> respuesta = "Entidad no encontrada";
+        }
+        return respuesta;
     }
 
-    private String ejecutarConsultaCrear(String entidad, String parametros) {
-        return "Creación de " + entidad + " con parámetros: " + parametros;
+    private String ejecutarConsultaCrear(String entidad, String parametros) throws SQLException {
+        String respuesta = "";
+        if (entidad.equals("CLIENTES")) {
+            ClientesN clientesN = new ClientesN();
+            respuesta = clientesN.agregarCliente("nombre", "apellido", "telefono", "genero", "fechanaciemiento", 1);
+        } else if (entidad.equals("MEDICAMENTOS")) {
+            respuesta = "Listado de medicamentos";
+        } else if (entidad.equals("ESPECIES")) {
+            EspeciesN especiesN = new EspeciesN();
+            //contar parametros
+            String[] params = parametros.split(",");
+            if (params.length == 1) {
+                respuesta = especiesN.agregarEspecie(params[0]);
+            } else {
+                respuesta = "Error en los parámetros";
+            }
+        } else {
+            respuesta = "Entidad no encontrada";
+        }
+        return respuesta;
     }
 
     private String ejecutarConsultaActualizar(String entidad, String parametros) {
