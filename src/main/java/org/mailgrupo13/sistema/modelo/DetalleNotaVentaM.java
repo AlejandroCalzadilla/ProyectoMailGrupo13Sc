@@ -95,6 +95,13 @@ public class DetalleNotaVentaM {
 
     // Crear un detalle de la nota de venta
     public boolean crearDetalleNotaVenta() {
+        if (!existeNotaVenta(idNotaVenta)) {
+            throw new IllegalArgumentException("No existe una nota de venta con el ID proporcionado: " + idNotaVenta);
+        }
+        if (!existeMedicamento(idMedicamento)) {
+            throw new IllegalArgumentException("No existe un medicamento con el ID proporcionado: " + idMedicamento);
+        }
+
         String sql = "INSERT INTO sales_note_details (quantity, sale_price, subtotal, sales_note_id, medicament_id, created_at, updated_at) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -108,8 +115,7 @@ public class DetalleNotaVentaM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al crear el detalle de la nota de venta: " + e.getMessage(), e);
         }
     }
 
@@ -130,15 +136,26 @@ public class DetalleNotaVentaM {
                 detalle.setCreadoEn(rs.getTimestamp("created_at"));
                 detalle.setActualizadoEn(rs.getTimestamp("updated_at"));
                 return detalle;
+            } else {
+                throw new IllegalArgumentException("No existe un detalle de nota de venta con el ID proporcionado: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Error al leer el detalle de la nota de venta: " + e.getMessage(), e);
         }
-        return null; // Si no se encuentra el detalle
     }
 
     // Actualizar un detalle de la nota de venta
     public boolean actualizarDetalleNotaVenta() {
+        if (!existeDetalleNotaVenta(id)) {
+            throw new IllegalArgumentException("No existe un detalle de nota de venta con el ID proporcionado: " + id);
+        }
+        if (!existeNotaVenta(idNotaVenta)) {
+            throw new IllegalArgumentException("No existe una nota de venta con el ID proporcionado: " + idNotaVenta);
+        }
+        if (!existeMedicamento(idMedicamento)) {
+            throw new IllegalArgumentException("No existe un medicamento con el ID proporcionado: " + idMedicamento);
+        }
+
         String sql = "UPDATE sales_note_details SET quantity = ?, sale_price = ?, subtotal = ?, updated_at = ? WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, cantidad);
@@ -149,21 +166,23 @@ public class DetalleNotaVentaM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al actualizar el detalle de la nota de venta: " + e.getMessage(), e);
         }
     }
 
     // Eliminar un detalle de la nota de venta
     public boolean eliminarDetalleNotaVenta(int id) {
+        if (!existeDetalleNotaVenta(id)) {
+            throw new IllegalArgumentException("No existe un detalle de nota de venta con el ID proporcionado: " + id);
+        }
+
         String sql = "DELETE FROM sales_note_details WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al eliminar el detalle de la nota de venta: " + e.getMessage(), e);
         }
     }
 
@@ -191,5 +210,49 @@ public class DetalleNotaVentaM {
         }
         return detalles;
     }
-}
 
+    // Verificar si un detalle de nota de venta existe por ID
+    private boolean existeDetalleNotaVenta(int id) {
+        String sql = "SELECT COUNT(*) FROM sales_note_details WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Verificar si una nota de venta existe por ID
+    private boolean existeNotaVenta(int idNotaVenta) {
+        String sql = "SELECT COUNT(*) FROM sales_notes WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idNotaVenta);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Verificar si un medicamento existe por ID
+    private boolean existeMedicamento(int idMedicamento) {
+        String sql = "SELECT COUNT(*) FROM medicaments WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idMedicamento);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}

@@ -1,4 +1,4 @@
-package org.mailgrupo13.sistema.negocio;
+package org.mailgrupo13.sistema.negocio.usuarios;
 
 
 import org.mailgrupo13.sistema.modelo.UsuariosM;
@@ -71,9 +71,13 @@ public class UsuariosN {
     }
 
     // CRUD Methods
+
+
+
+    /*
     public List<UsuariosN> obtenerUsuarios() throws SQLException {
         return mapear(usuariosM.obtenerUsuarios());
-    }
+    }*/
 
     public String agregarUsuario(String email, String password, String nombre) throws SQLException {
         try {

@@ -95,6 +95,10 @@ public class ConsultasMedicasM {
 
     // Crear una consulta médica
     public boolean crearConsultaMedica() {
+        if (!existeMascota(petId)) {
+            throw new IllegalArgumentException("No existe una mascota con el ID proporcionado: " + petId);
+        }
+
         String sql = "INSERT INTO medical_consultations (date, reason, diagnosis, consultation_fee, pet_id, created_at, updated_at) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -108,8 +112,7 @@ public class ConsultasMedicasM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al crear la consulta médica: " + e.getMessage(), e);
         }
     }
 
@@ -130,15 +133,23 @@ public class ConsultasMedicasM {
                 consulta.setCreadoEn(rs.getTimestamp("created_at"));
                 consulta.setActualizadoEn(rs.getTimestamp("updated_at"));
                 return consulta;
+            } else {
+                throw new IllegalArgumentException("No existe una consulta médica con el ID proporcionado: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Error al leer la consulta médica: " + e.getMessage(), e);
         }
-        return null; // Si no se encuentra la consulta
     }
 
     // Actualizar una consulta médica
     public boolean actualizarConsultaMedica() {
+        if (!existeConsultaMedica(id)) {
+            throw new IllegalArgumentException("No existe una consulta médica con el ID proporcionado: " + id);
+        }
+        if (!existeMascota(petId)) {
+            throw new IllegalArgumentException("No existe una mascota con el ID proporcionado: " + petId);
+        }
+
         String sql = "UPDATE medical_consultations SET date = ?, reason = ?, diagnosis = ?, consultation_fee = ?, " +
                 "pet_id = ?, updated_at = ? WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -152,21 +163,23 @@ public class ConsultasMedicasM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al actualizar la consulta médica: " + e.getMessage(), e);
         }
     }
 
     // Eliminar una consulta médica
     public boolean eliminarConsultaMedica(int id) {
+        if (!existeConsultaMedica(id)) {
+            throw new IllegalArgumentException("No existe una consulta médica con el ID proporcionado: " + id);
+        }
+
         String sql = "DELETE FROM medical_consultations WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al eliminar la consulta médica: " + e.getMessage(), e);
         }
     }
 
@@ -192,5 +205,35 @@ public class ConsultasMedicasM {
             e.printStackTrace();
         }
         return consultas;
+    }
+
+    // Verificar si una consulta médica existe por ID
+    private boolean existeConsultaMedica(int id) {
+        String sql = "SELECT COUNT(*) FROM medical_consultations WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Verificar si una mascota existe por ID
+    private boolean existeMascota(int petId) {
+        String sql = "SELECT COUNT(*) FROM pets WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, petId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

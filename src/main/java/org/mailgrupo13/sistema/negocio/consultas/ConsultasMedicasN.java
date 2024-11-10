@@ -1,4 +1,4 @@
-package org.mailgrupo13.sistema.negocio;
+package org.mailgrupo13.sistema.negocio.consultas;
 
 import org.mailgrupo13.sistema.modelo.ConsultasMedicasM;
 

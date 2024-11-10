@@ -78,12 +78,11 @@ public class NotaVentaM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al crear la nota de venta: " + e.getMessage(), e);
         }
     }
 
-    // Leer una nota de venta por ID (Devuelve un objeto NotaVentaM completo)
+    // Leer una nota de venta por ID
     public NotaVentaM leerNotaVenta(int id) {
         String sql = "SELECT * FROM sales_notes WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -97,15 +96,20 @@ public class NotaVentaM {
                 notaVenta.setCreadoEn(rs.getTimestamp("created_at"));
                 notaVenta.setActualizadoEn(rs.getTimestamp("updated_at"));
                 return notaVenta;
+            } else {
+                throw new IllegalArgumentException("No existe una nota de venta con el ID proporcionado: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Error al leer la nota de venta: " + e.getMessage(), e);
         }
-        return null; // Si no se encuentra la nota de venta
     }
 
     // Actualizar una nota de venta
     public boolean actualizarNotaVenta() {
+        if (!existeNotaVenta(id)) {
+            throw new IllegalArgumentException("No existe una nota de venta con el ID proporcionado: " + id);
+        }
+
         String sql = "UPDATE sales_notes SET sale_date = ?, total_amount = ?, updated_at = ? WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setDate(1, fechaVenta);
@@ -115,21 +119,23 @@ public class NotaVentaM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al actualizar la nota de venta: " + e.getMessage(), e);
         }
     }
 
     // Eliminar una nota de venta
     public boolean eliminarNotaVenta(int id) {
+        if (!existeNotaVenta(id)) {
+            throw new IllegalArgumentException("No existe una nota de venta con el ID proporcionado: " + id);
+        }
+
         String sql = "DELETE FROM sales_notes WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al eliminar la nota de venta: " + e.getMessage(), e);
         }
     }
 
@@ -152,5 +158,20 @@ public class NotaVentaM {
             e.printStackTrace();
         }
         return notas;
+    }
+
+    // Verificar si una nota de venta existe por ID
+    private boolean existeNotaVenta(int id) {
+        String sql = "SELECT COUNT(*) FROM sales_notes WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

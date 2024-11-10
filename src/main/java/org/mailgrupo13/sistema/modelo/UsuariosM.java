@@ -3,6 +3,8 @@ package org.mailgrupo13.sistema.modelo;
 import org.mailgrupo13.sistema.conexion.Conexion;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UsuariosM {
 
@@ -10,13 +12,14 @@ public class UsuariosM {
     private String email;
     private String password;
     private String nombre;
-
+    private Timestamp creadoEn;
+    private Timestamp actualizadoEn;
     private Conexion conexion;
     private Connection conn;
 
     // Constructor
     public UsuariosM() throws SQLException {
-        conexion = conexion.getInstancia();
+        conexion = Conexion.getInstancia();
         conn = conexion.getConnection();
     }
 
@@ -53,68 +56,133 @@ public class UsuariosM {
         this.nombre = nombre;
     }
 
+    public Timestamp getCreadoEn() {
+        return creadoEn;
+    }
+
+    public void setCreadoEn(Timestamp creadoEn) {
+        this.creadoEn = creadoEn;
+    }
+
+    public Timestamp getActualizadoEn() {
+        return actualizadoEn;
+    }
+
+    public void setActualizadoEn(Timestamp actualizadoEn) {
+        this.actualizadoEn = actualizadoEn;
+    }
+
     // Métodos CRUD
 
     // Crear un usuario
     public boolean crearUsuario() {
-        String sql = "INSERT INTO users (email, password, name) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO users (email, password, name, created_at, updated_at) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, email);
             stmt.setString(2, password);
             stmt.setString(3, nombre);
+            stmt.setTimestamp(4, creadoEn);
+            stmt.setTimestamp(5, actualizadoEn);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al crear el usuario: " + e.getMessage(), e);
         }
     }
 
     // Leer un usuario por ID
-    public boolean leerUsuario(int id) {
+    public UsuariosM leerUsuario(int id) {
         String sql = "SELECT * FROM users WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                this.id = rs.getInt("id");
-                email = rs.getString("email");
-                password = rs.getString("password");
-                nombre = rs.getString("name");
-                return true;
+                UsuariosM usuario = new UsuariosM();
+                usuario.setId(rs.getInt("id"));
+                usuario.setEmail(rs.getString("email"));
+                usuario.setPassword("********"); // Placeholder value
+                usuario.setNombre(rs.getString("name"));
+                usuario.setCreadoEn(rs.getTimestamp("created_at"));
+                usuario.setActualizadoEn(rs.getTimestamp("updated_at"));
+                return usuario;
+            } else {
+                throw new IllegalArgumentException("No existe un usuario con el ID proporcionado: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Error al leer el usuario: " + e.getMessage(), e);
         }
-        return false;
     }
 
     // Actualizar un usuario
     public boolean actualizarUsuario() {
-        String sql = "UPDATE users SET email = ?, password = ?, name = ? WHERE id = ?";
+        if (!existeUsuario(id)) {
+            throw new IllegalArgumentException("No existe un usuario con el ID proporcionado: " + id);
+        }
+
+        String sql = "UPDATE users SET email = ?, password = ?, name = ?, updated_at = ? WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, email);
             stmt.setString(2, password);
             stmt.setString(3, nombre);
-            stmt.setInt(4, id);
+            stmt.setTimestamp(4, actualizadoEn);
+            stmt.setInt(5, id);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al actualizar el usuario: " + e.getMessage(), e);
         }
     }
 
     // Eliminar un usuario
     public boolean eliminarUsuario(int id) {
+        if (!existeUsuario(id)) {
+            throw new IllegalArgumentException("No existe un usuario con el ID proporcionado: " + id);
+        }
+
         String sql = "DELETE FROM users WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al eliminar el usuario: " + e.getMessage(), e);
         }
+    }
+
+    // Obtener todos los usuarios
+    public List<UsuariosM> obtenerUsuarios() {
+        List<UsuariosM> usuarios = new ArrayList<>();
+        String sql = "SELECT * FROM users";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                UsuariosM usuario = new UsuariosM();
+                usuario.setId(rs.getInt("id"));
+                usuario.setEmail(rs.getString("email"));
+                usuario.setPassword("********"); // Placeholder value
+                usuario.setNombre(rs.getString("name"));
+                usuario.setCreadoEn(rs.getTimestamp("created_at"));
+                usuario.setActualizadoEn(rs.getTimestamp("updated_at"));
+                usuarios.add(usuario);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return usuarios;
+    }
+
+    // Verificar si un usuario existe por ID
+    private boolean existeUsuario(int id) {
+        String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

@@ -68,6 +68,10 @@ public class RazasM {
 
     // Crear una raza
     public boolean crearRaza() {
+        if (!existeEspecie(idEspecie)) {
+            throw new IllegalArgumentException("No existe una especie con el ID proporcionado: " + idEspecie);
+        }
+
         String sql = "INSERT INTO breeds (name, species_id, created_at, updated_at) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nombre);
@@ -77,8 +81,7 @@ public class RazasM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al crear la raza: " + e.getMessage(), e);
         }
     }
 
@@ -96,15 +99,23 @@ public class RazasM {
                 raza.setCreadoEn(rs.getTimestamp("created_at"));
                 raza.setActualizadoEn(rs.getTimestamp("updated_at"));
                 return raza;
+            } else {
+                throw new IllegalArgumentException("No existe una raza con el ID proporcionado: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Error al leer la raza: " + e.getMessage(), e);
         }
-        return null; // Si no se encuentra la raza
     }
 
     // Actualizar una raza
     public boolean actualizarRaza() {
+        if (!existeRaza(id)) {
+            throw new IllegalArgumentException("No existe una raza con el ID proporcionado: " + id);
+        }
+        if (!existeEspecie(idEspecie)) {
+            throw new IllegalArgumentException("No existe una especie con el ID proporcionado: " + idEspecie);
+        }
+
         String sql = "UPDATE breeds SET name = ?, species_id = ?, updated_at = ? WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nombre);
@@ -114,21 +125,23 @@ public class RazasM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al actualizar la raza: " + e.getMessage(), e);
         }
     }
 
     // Eliminar una raza
     public boolean eliminarRaza(int id) {
+        if (!existeRaza(id)) {
+            throw new IllegalArgumentException("No existe una raza con el ID proporcionado: " + id);
+        }
+
         String sql = "DELETE FROM breeds WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al eliminar la raza: " + e.getMessage(), e);
         }
     }
 
@@ -151,5 +164,35 @@ public class RazasM {
             e.printStackTrace();
         }
         return razas;
+    }
+
+    // Verificar si una raza existe por ID
+    private boolean existeRaza(int id) {
+        String sql = "SELECT COUNT(*) FROM breeds WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Verificar si una especie existe por ID
+    private boolean existeEspecie(int idEspecie) {
+        String sql = "SELECT COUNT(*) FROM species WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idEspecie);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

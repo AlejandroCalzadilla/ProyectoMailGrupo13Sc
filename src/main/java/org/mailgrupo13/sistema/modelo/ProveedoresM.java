@@ -4,6 +4,7 @@ import org.mailgrupo13.sistema.conexion.Conexion;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
 public class ProveedoresM {
 
     private int id;
@@ -92,7 +93,10 @@ public class ProveedoresM {
     // Métodos CRUD
 
     // Crear un proveedor
-    public boolean crearProveedor() {
+    public String crearProveedor() {
+        if (existeProveedor(nombre)) {
+            throw new IllegalArgumentException("Ya existe un proveedor con el mismo nombre: " + nombre);
+        }
         String sql = "INSERT INTO suppliers (name, country, phone_number, email, address, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nombre);
@@ -103,40 +107,53 @@ public class ProveedoresM {
             stmt.setTimestamp(6, creadoEn);
             stmt.setTimestamp(7, actualizadoEn);
             stmt.executeUpdate();
-            return true;
+            return "Proveedor creado";
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al crear el proveedor: " + e.getMessage(), e);
         }
     }
 
     // Leer un proveedor por ID
-    public boolean leerProveedor(int id) {
+    public ProveedoresM leerProveedor(int id) {
         String sql = "SELECT * FROM suppliers WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                this.id = rs.getInt("id");
-                nombre = rs.getString("name");
-                pais = rs.getString("country");
-                telefono = rs.getString("phone_number");
-                email = rs.getString("email");
-                direccion = rs.getString("address");
-                creadoEn = rs.getTimestamp("created_at");
-                actualizadoEn = rs.getTimestamp("updated_at");
-                return true;
+                ProveedoresM proveedor = new ProveedoresM();
+                proveedor.setId(rs.getInt("id"));
+                proveedor.setNombre(rs.getString("name"));
+                proveedor.setPais(rs.getString("country"));
+                proveedor.setTelefono(rs.getString("phone_number"));
+                proveedor.setEmail(rs.getString("email"));
+                proveedor.setDireccion(rs.getString("address"));
+                proveedor.setCreadoEn(rs.getTimestamp("created_at"));
+                proveedor.setActualizadoEn(rs.getTimestamp("updated_at"));
+                return proveedor;
+            } else {
+                throw new IllegalArgumentException("No existe un proveedor con el ID proporcionado: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Error al leer el proveedor: " + e.getMessage(), e);
         }
-        return false;
     }
 
     // Actualizar un proveedor
-    public boolean actualizarProveedor() {
+    public String actualizarProveedor() {
+        if (existeProveedor(nombre)) {
+            throw new IllegalArgumentException("Ya existe un proveedor con el mismo nombre: " + nombre);
+        }
+
+        String checkSql = "SELECT COUNT(*) FROM suppliers WHERE id = ?";
         String sql = "UPDATE suppliers SET name = ?, country = ?, phone_number = ?, email = ?, address = ?, updated_at = ? WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement checkStmt = conn.prepareStatement(checkSql);
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            checkStmt.setInt(1, id);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next() && rs.getInt(1) == 0) {
+                throw new IllegalArgumentException("No existe un proveedor con el ID proporcionado: " + id);
+            }
+
             stmt.setString(1, nombre);
             stmt.setString(2, pais);
             stmt.setString(3, telefono);
@@ -145,23 +162,29 @@ public class ProveedoresM {
             stmt.setTimestamp(6, actualizadoEn);
             stmt.setInt(7, id);
             stmt.executeUpdate();
-            return true;
+            return "Proveedor actualizado";
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al actualizar el proveedor: " + e.getMessage(), e);
         }
     }
 
     // Eliminar un proveedor
-    public boolean eliminarProveedor(int id) {
-        String sql = "DELETE FROM suppliers WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-            return true;
+    public String eliminarProveedor(int id) {
+        String checkSql = "SELECT COUNT(*) FROM suppliers WHERE id = ?";
+        String deleteSql = "DELETE FROM suppliers WHERE id = ?";
+        try (PreparedStatement checkStmt = conn.prepareStatement(checkSql);
+             PreparedStatement deleteStmt = conn.prepareStatement(deleteSql)) {
+            checkStmt.setInt(1, id);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next() && rs.getInt(1) == 0) {
+                throw new IllegalArgumentException("No existe un proveedor con el ID proporcionado: " + id);
+            }
+
+            deleteStmt.setInt(1, id);
+            deleteStmt.executeUpdate();
+            return "Proveedor eliminado";
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al eliminar el proveedor: " + e.getMessage(), e);
         }
     }
 
@@ -183,14 +206,24 @@ public class ProveedoresM {
                 proveedor.setActualizadoEn(rs.getTimestamp("updated_at"));
                 proveedores.add(proveedor);
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return proveedores;
-     }
+    }
 
-
-
-
+    // Verificar si un proveedor existe por nombre
+    private boolean existeProveedor(String nombre) {
+        String sql = "SELECT COUNT(*) FROM suppliers WHERE name = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nombre);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

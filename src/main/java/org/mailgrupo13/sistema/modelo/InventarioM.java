@@ -1,4 +1,5 @@
 package org.mailgrupo13.sistema.modelo;
+
 import org.mailgrupo13.sistema.conexion.Conexion;
 
 import java.sql.*;
@@ -85,6 +86,13 @@ public class InventarioM {
 
     // Crear un inventario
     public boolean crearInventario() {
+        if (!existeMedicamento(medicamentoId)) {
+            throw new IllegalArgumentException("No existe un medicamento con el ID proporcionado: " + medicamentoId);
+        }
+        if (!existeBodega(bodegaId)) {
+            throw new IllegalArgumentException("No existe una bodega con el ID proporcionado: " + bodegaId);
+        }
+
         String sql = "INSERT INTO inventory (stock, price, medicament_id, warehouse_id, created_at, updated_at) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -97,12 +105,11 @@ public class InventarioM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al crear el inventario: " + e.getMessage(), e);
         }
     }
 
-    // Leer un inventario por ID (Devuelve un objeto InventarioM completo)
+    // Leer un inventario por ID
     public InventarioM leerInventario(int id) {
         String sql = "SELECT * FROM inventory WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -118,15 +125,26 @@ public class InventarioM {
                 inventario.setCreadoEn(rs.getTimestamp("created_at"));
                 inventario.setActualizadoEn(rs.getTimestamp("updated_at"));
                 return inventario;
+            } else {
+                throw new IllegalArgumentException("No existe un inventario con el ID proporcionado: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Error al leer el inventario: " + e.getMessage(), e);
         }
-        return null; // Si no se encuentra el inventario
     }
 
     // Actualizar un inventario
     public boolean actualizarInventario() {
+        if (!existeInventario(id)) {
+            throw new IllegalArgumentException("No existe un inventario con el ID proporcionado: " + id);
+        }
+        if (!existeMedicamento(medicamentoId)) {
+            throw new IllegalArgumentException("No existe un medicamento con el ID proporcionado: " + medicamentoId);
+        }
+        if (!existeBodega(bodegaId)) {
+            throw new IllegalArgumentException("No existe una bodega con el ID proporcionado: " + bodegaId);
+        }
+
         String sql = "UPDATE inventory SET stock = ?, price = ?, medicament_id = ?, warehouse_id = ?, updated_at = ? WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, stock);
@@ -138,21 +156,23 @@ public class InventarioM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al actualizar el inventario: " + e.getMessage(), e);
         }
     }
 
     // Eliminar un inventario
     public boolean eliminarInventario(int id) {
+        if (!existeInventario(id)) {
+            throw new IllegalArgumentException("No existe un inventario con el ID proporcionado: " + id);
+        }
+
         String sql = "DELETE FROM inventory WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al eliminar el inventario: " + e.getMessage(), e);
         }
     }
 
@@ -178,5 +198,49 @@ public class InventarioM {
         }
         return inventarios;
     }
-}
 
+    // Verificar si un inventario existe por ID
+    private boolean existeInventario(int id) {
+        String sql = "SELECT COUNT(*) FROM inventory WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Verificar si un medicamento existe por ID
+    private boolean existeMedicamento(int medicamentoId) {
+        String sql = "SELECT COUNT(*) FROM medicaments WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, medicamentoId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Verificar si una bodega existe por ID
+    private boolean existeBodega(int bodegaId) {
+        String sql = "SELECT COUNT(*) FROM warehouses WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, bodegaId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}

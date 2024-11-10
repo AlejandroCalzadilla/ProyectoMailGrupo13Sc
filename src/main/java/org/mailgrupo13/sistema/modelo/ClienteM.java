@@ -2,12 +2,7 @@ package org.mailgrupo13.sistema.modelo;
 
 import org.mailgrupo13.sistema.conexion.Conexion;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Date;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +22,8 @@ public class ClienteM {
   private Connection conn;
 
   public ClienteM() throws SQLException {
-
-    conexion= conexion.getInstancia();
-    conn=conexion.getConnection();
+    conexion = Conexion.getInstancia();
+    conn = conexion.getConnection();
   }
 
   // Getters y Setters
@@ -64,7 +58,11 @@ public class ClienteM {
   // Consultas CRUD
 
   // Crear un cliente
-  public boolean crearCliente() {
+  public String crearCliente() {
+    if (!existeUsuario(idUsuario)) {
+      throw new IllegalArgumentException("No existe un usuario con el ID proporcionado: " + idUsuario);
+    }
+
     String sql = "INSERT INTO customers (first_name, last_name, phone_number, gender, birthdate, id_user, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     try (PreparedStatement stmt = conn.prepareStatement(sql)) {
       stmt.setString(1, nombre);
@@ -76,10 +74,9 @@ public class ClienteM {
       stmt.setTimestamp(7, creadoEn);
       stmt.setTimestamp(8, actualizadoEn);
       stmt.executeUpdate();
-      return true;
+      return "Cliente creado";
     } catch (SQLException e) {
-      e.printStackTrace();
-      return false;
+      throw new IllegalArgumentException("Error al crear el cliente: " + e.getMessage(), e);
     }
   }
 
@@ -96,7 +93,7 @@ public class ClienteM {
         cliente.setTelefono(rs.getString("phone_number"));
         cliente.setGenero(rs.getString("gender"));
         cliente.setFechaNacimiento(rs.getDate("birthdate"));
-        cliente.setIdUsuario(rs.getInt("user_id"));
+        cliente.setIdUsuario(rs.getInt("id_user"));
         cliente.setCreadoEn(rs.getTimestamp("created_at"));
         cliente.setActualizadoEn(rs.getTimestamp("updated_at"));
         clientes.add(cliente);
@@ -106,7 +103,6 @@ public class ClienteM {
     }
     return clientes;
   }
-
 
   // Leer un cliente por ID
   public boolean leerCliente(int id) {
@@ -121,21 +117,34 @@ public class ClienteM {
         telefono = rs.getString("phone_number");
         genero = rs.getString("gender");
         fechaNacimiento = rs.getDate("birthdate");
-        idUsuario = rs.getInt("user_id");
+        idUsuario = rs.getInt("id_user");
         creadoEn = rs.getTimestamp("created_at");
         actualizadoEn = rs.getTimestamp("updated_at");
         return true;
+      } else {
+        throw new IllegalArgumentException("No existe un cliente con el ID proporcionado: " + id);
       }
     } catch (SQLException e) {
-      e.printStackTrace();
+      throw new IllegalArgumentException("Error al leer el cliente: " + e.getMessage(), e);
     }
-    return false;
   }
 
   // Actualizar un cliente
   public boolean actualizarCliente() {
+    if (!existeUsuario(idUsuario)) {
+      throw new IllegalArgumentException("No existe un usuario con el ID proporcionado: " + idUsuario);
+    }
+
+    String checkSql = "SELECT COUNT(*) FROM customers WHERE id = ?";
     String sql = "UPDATE customers SET first_name = ?, last_name = ?, phone_number = ?, gender = ?, birthdate = ?, id_user = ?, updated_at = ? WHERE id = ?";
-    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try (PreparedStatement checkStmt = conn.prepareStatement(checkSql);
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+      checkStmt.setInt(1, id);
+      ResultSet rs = checkStmt.executeQuery();
+      if (rs.next() && rs.getInt(1) == 0) {
+        throw new IllegalArgumentException("No existe un cliente con el ID proporcionado: " + id);
+      }
+
       stmt.setString(1, nombre);
       stmt.setString(2, apellido);
       stmt.setString(3, telefono);
@@ -147,21 +156,42 @@ public class ClienteM {
       stmt.executeUpdate();
       return true;
     } catch (SQLException e) {
-      e.printStackTrace();
-      return false;
+      throw new IllegalArgumentException("Error al actualizar el cliente: " + e.getMessage(), e);
     }
   }
 
   // Eliminar un cliente
   public boolean eliminarCliente(int id) {
-    String sql = "DELETE FROM customers WHERE id = ?";
-    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-      stmt.setInt(1, id);
-      stmt.executeUpdate();
+    String checkSql = "SELECT COUNT(*) FROM customers WHERE id = ?";
+    String deleteSql = "DELETE FROM customers WHERE id = ?";
+    try (PreparedStatement checkStmt = conn.prepareStatement(checkSql);
+         PreparedStatement deleteStmt = conn.prepareStatement(deleteSql)) {
+      checkStmt.setInt(1, id);
+      ResultSet rs = checkStmt.executeQuery();
+      if (rs.next() && rs.getInt(1) == 0) {
+        throw new IllegalArgumentException("No existe un cliente con el ID proporcionado: " + id);
+      }
+
+      deleteStmt.setInt(1, id);
+      deleteStmt.executeUpdate();
       return true;
     } catch (SQLException e) {
-      e.printStackTrace();
-      return false;
+      throw new IllegalArgumentException("Error al eliminar el cliente: " + e.getMessage(), e);
     }
+  }
+
+  // Verificar si un usuario existe por ID
+  private boolean existeUsuario(int idUsuario) {
+    String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+      stmt.setInt(1, idUsuario);
+      ResultSet rs = stmt.executeQuery();
+      if (rs.next()) {
+        return rs.getInt(1) > 0;
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return false;
   }
 }

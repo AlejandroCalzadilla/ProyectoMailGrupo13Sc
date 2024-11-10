@@ -1,4 +1,4 @@
-package org.mailgrupo13.sistema.negocio;
+package org.mailgrupo13.sistema.negocio.mascotas;
 
 import org.mailgrupo13.sistema.modelo.MascotasM;
 

@@ -5,13 +5,13 @@ import org.mailgrupo13.sistema.conexion.Conexion;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
 public class CategoriasM {
 
     private int id;
     private String nombre;
     private Timestamp creadoEn;
     private Timestamp actualizadoEn;
-
     private Conexion conexion;
     private Connection conn;
 
@@ -58,6 +58,10 @@ public class CategoriasM {
 
     // Crear una categoría
     public boolean crearCategoria() {
+        if (existeCategoria(nombre)) {
+            throw new IllegalArgumentException("Ya existe una categoría con el mismo nombre: " + nombre);
+        }
+
         String sql = "INSERT INTO category (name, created_at, updated_at) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nombre);
@@ -66,55 +70,74 @@ public class CategoriasM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al crear la categoría: " + e.getMessage(), e);
         }
     }
 
     // Leer una categoría por ID
-    public boolean leerCategoria(int id) {
+    public CategoriasM leerCategoria(int id) {
         String sql = "SELECT * FROM category WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                this.id = rs.getInt("id");
-                nombre = rs.getString("name");
-                creadoEn = rs.getTimestamp("created_at");
-                actualizadoEn = rs.getTimestamp("updated_at");
-                return true;
+                CategoriasM categoriasM =new CategoriasM();
+                categoriasM.id = rs.getInt("id");
+                categoriasM.nombre = rs.getString("name");
+                categoriasM.creadoEn = rs.getTimestamp("created_at");
+                categoriasM.actualizadoEn = rs.getTimestamp("updated_at");
+                return  categoriasM;
+            } else {
+                throw new IllegalArgumentException("No existe una categoría con el ID proporcionado: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Error al leer la categoría: " + e.getMessage(), e);
         }
-        return false;
     }
 
     // Actualizar una categoría
-    public boolean actualizarCategoria() {
+    public String actualizarCategoria() {
+        if (existeCategoria(nombre)) {
+            throw new IllegalArgumentException("Ya existe una categoría con el mismo nombre: " + nombre);
+        }
+
+        String checkSql = "SELECT COUNT(*) FROM category WHERE id = ?";
         String sql = "UPDATE category SET name = ?, updated_at = ? WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement checkStmt = conn.prepareStatement(checkSql);
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            checkStmt.setInt(1, id);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next() && rs.getInt(1) == 0) {
+                throw new IllegalArgumentException("No existe una categoría con el ID proporcionado: " + id);
+            }
+
             stmt.setString(1, nombre);
             stmt.setTimestamp(2, actualizadoEn);
             stmt.setInt(3, id);
             stmt.executeUpdate();
-            return true;
+            return "Categoría actualizada";
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al actualizar la categoría: " + e.getMessage(), e);
         }
     }
 
     // Eliminar una categoría
-    public boolean eliminarCategoria(int id) {
-        String sql = "DELETE FROM category WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-            return true;
+    public String eliminarCategoria(int id) {
+        String checkSql = "SELECT COUNT(*) FROM category WHERE id = ?";
+        String deleteSql = "DELETE FROM category WHERE id = ?";
+        try (PreparedStatement checkStmt = conn.prepareStatement(checkSql);
+             PreparedStatement deleteStmt = conn.prepareStatement(deleteSql)) {
+            checkStmt.setInt(1, id);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next() && rs.getInt(1) == 0) {
+                throw new IllegalArgumentException("No existe una categoría con el ID proporcionado: " + id);
+            }
+
+            deleteStmt.setInt(1, id);
+            deleteStmt.executeUpdate();
+            return "Categoría eliminada";
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al eliminar la categoría: " + e.getMessage(), e);
         }
     }
 
@@ -136,5 +159,20 @@ public class CategoriasM {
             e.printStackTrace();
         }
         return categorias;
+    }
+
+    // Verificar si una categoría existe por nombre
+    private boolean existeCategoria(String nombre) {
+        String sql = "SELECT COUNT(*) FROM category WHERE name = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nombre);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

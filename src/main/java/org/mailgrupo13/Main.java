@@ -1,25 +1,43 @@
 package org.mailgrupo13;
 
-import org.mailgrupo13.sistema.modelo.CategoriasM;
-import org.mailgrupo13.sistema.modelo.ClienteM;
-import org.mailgrupo13.sistema.modelo.EspeciesM;
-import org.mailgrupo13.sistema.modelo.MedicamentosM;
+import org.mailgrupo13.sistema.negocio.almacenes.AlmacenesN;
+import org.mailgrupo13.sistema.negocio.categorias.CategoriasN;
+import org.mailgrupo13.sistema.negocio.clientes.ClientesN;
+import org.mailgrupo13.sistema.negocio.mascotas.EspeciesN;
+import org.mailgrupo13.sistema.negocio.proveedores.ProveedoresN;
 
-import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
 
-        ClienteM cliente = new ClienteM();
-        EspeciesM especie = new EspeciesM();
-        especie.setNombre("ave");
-        especie.setCreadoEn(Timestamp.valueOf(LocalDateTime.now()));
-        especie.setActualizadoEn(Timestamp.valueOf(LocalDateTime.now()));
-        boolean exito = especie.crearEspecie();
-        System.out.println(exito+"posi o nega");
+        //ClienteM cliente = new ClienteM();
+
+        EspeciesN especie= new EspeciesN();
+        AlmacenesN almacen=new AlmacenesN();
+        ClientesN cliente=new ClientesN();
+        CategoriasN categoria=new CategoriasN();
+        ProveedoresN proveedor=new ProveedoresN();
+
+        try {
+            //especie.agregarEspecie("ale");
+            //especie.eliminarEspecie(10);
+           // especie.actualizarEspecie(100,"aves");
+          //   especie.leerEspecie(1);
+            System.out.println(especie.obtenerEspecies());
+
+
+
+
+
+         }catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+
+
+        //boolean exito = especie.crearEspecie();
+        //System.out.println(exito+"posi o nega");
 
         /*especie.crearEspecie();
         cliente.setNombre("Juan");
@@ -36,6 +54,9 @@ public class Main {
         //System.out.println(exito+"posi o nega");
 
 
+
+
+        /*
         CategoriasM categoria = new CategoriasM();
         categoria.setNombre("Laminado");
         categoria.setCreadoEn(new Timestamp(System.currentTimeMillis()));
@@ -48,8 +69,11 @@ public class Main {
         }
 
 
+         */
 
-        //medicamentos
+
+
+        /*
         MedicamentosM medicamento = new MedicamentosM();
         medicamento.setNombre("Ibuprofeno");
         medicamento.setDosis("200mg");
@@ -63,7 +87,7 @@ public class Main {
         boolean resultado = medicamento.crearMedicamento();
         System.out.println(medicamento.obtenerMedicamentos());
         System.out.println(medicamento.leerMedicamento(1));
-
+        */
 
 
 

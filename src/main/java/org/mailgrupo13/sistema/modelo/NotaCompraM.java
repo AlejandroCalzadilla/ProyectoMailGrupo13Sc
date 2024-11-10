@@ -77,6 +77,10 @@ public class NotaCompraM {
 
     // Crear una nota de compra
     public boolean crearNotaCompra() {
+        if (!existeProveedor(proveedorId)) {
+            throw new IllegalArgumentException("No existe un proveedor con el ID proporcionado: " + proveedorId);
+        }
+
         String sql = "INSERT INTO purchase_note (purchase_date, total_amount, supplier_id, created_at, updated_at) " +
                 "VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -88,12 +92,11 @@ public class NotaCompraM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al crear la nota de compra: " + e.getMessage(), e);
         }
     }
 
-    // Leer una nota de compra por ID (Devuelve un objeto NotaCompraM completo)
+    // Leer una nota de compra por ID
     public NotaCompraM leerNotaCompra(int id) {
         String sql = "SELECT * FROM purchase_note WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -108,15 +111,23 @@ public class NotaCompraM {
                 notaCompra.setCreadoEn(rs.getTimestamp("created_at"));
                 notaCompra.setActualizadoEn(rs.getTimestamp("updated_at"));
                 return notaCompra;
+            } else {
+                throw new IllegalArgumentException("No existe una nota de compra con el ID proporcionado: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Error al leer la nota de compra: " + e.getMessage(), e);
         }
-        return null; // Si no se encuentra la nota de compra
     }
 
     // Actualizar una nota de compra
     public boolean actualizarNotaCompra() {
+        if (!existeNotaCompra(id)) {
+            throw new IllegalArgumentException("No existe una nota de compra con el ID proporcionado: " + id);
+        }
+        if (!existeProveedor(proveedorId)) {
+            throw new IllegalArgumentException("No existe un proveedor con el ID proporcionado: " + proveedorId);
+        }
+
         String sql = "UPDATE purchase_note SET purchase_date = ?, total_amount = ?, supplier_id = ?, updated_at = ? WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setDate(1, fechaCompra);
@@ -127,21 +138,23 @@ public class NotaCompraM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al actualizar la nota de compra: " + e.getMessage(), e);
         }
     }
 
     // Eliminar una nota de compra
     public boolean eliminarNotaCompra(int id) {
+        if (!existeNotaCompra(id)) {
+            throw new IllegalArgumentException("No existe una nota de compra con el ID proporcionado: " + id);
+        }
+
         String sql = "DELETE FROM purchase_note WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al eliminar la nota de compra: " + e.getMessage(), e);
         }
     }
 
@@ -165,5 +178,35 @@ public class NotaCompraM {
             e.printStackTrace();
         }
         return notasCompra;
+    }
+
+    // Verificar si una nota de compra existe por ID
+    private boolean existeNotaCompra(int id) {
+        String sql = "SELECT COUNT(*) FROM purchase_note WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Verificar si un proveedor existe por ID
+    private boolean existeProveedor(int proveedorId) {
+        String sql = "SELECT COUNT(*) FROM suppliers WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, proveedorId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

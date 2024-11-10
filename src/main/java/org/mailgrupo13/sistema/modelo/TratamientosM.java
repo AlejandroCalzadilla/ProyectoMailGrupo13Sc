@@ -77,6 +77,10 @@ public class TratamientosM {
 
     // Crear un tratamiento
     public boolean crearTratamiento() {
+        if (!existeConsulta(consultaId)) {
+            throw new IllegalArgumentException("No existe una consulta con el ID proporcionado: " + consultaId);
+        }
+
         String sql = "INSERT INTO treatments (medication, notes, consultation_id, created_at, updated_at) " +
                 "VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -88,8 +92,7 @@ public class TratamientosM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al crear el tratamiento: " + e.getMessage(), e);
         }
     }
 
@@ -108,15 +111,23 @@ public class TratamientosM {
                 tratamiento.setCreadoEn(rs.getTimestamp("created_at"));
                 tratamiento.setActualizadoEn(rs.getTimestamp("updated_at"));
                 return tratamiento;
+            } else {
+                throw new IllegalArgumentException("No existe un tratamiento con el ID proporcionado: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Error al leer el tratamiento: " + e.getMessage(), e);
         }
-        return null; // Si no se encuentra el tratamiento
     }
 
     // Actualizar un tratamiento
     public boolean actualizarTratamiento() {
+        if (!existeTratamiento(id)) {
+            throw new IllegalArgumentException("No existe un tratamiento con el ID proporcionado: " + id);
+        }
+        if (!existeConsulta(consultaId)) {
+            throw new IllegalArgumentException("No existe una consulta con el ID proporcionado: " + consultaId);
+        }
+
         String sql = "UPDATE treatments SET medication = ?, notes = ?, consultation_id = ?, updated_at = ? WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, medicamento);
@@ -127,21 +138,23 @@ public class TratamientosM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al actualizar el tratamiento: " + e.getMessage(), e);
         }
     }
 
     // Eliminar un tratamiento
     public boolean eliminarTratamiento(int id) {
+        if (!existeTratamiento(id)) {
+            throw new IllegalArgumentException("No existe un tratamiento con el ID proporcionado: " + id);
+        }
+
         String sql = "DELETE FROM treatments WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al eliminar el tratamiento: " + e.getMessage(), e);
         }
     }
 
@@ -166,5 +179,34 @@ public class TratamientosM {
         }
         return tratamientos;
     }
-}
 
+    // Verificar si un tratamiento existe por ID
+    private boolean existeTratamiento(int id) {
+        String sql = "SELECT COUNT(*) FROM treatments WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Verificar si una consulta existe por ID
+    private boolean existeConsulta(int consultaId) {
+        String sql = "SELECT COUNT(*) FROM medical_consultations WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, consultaId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}

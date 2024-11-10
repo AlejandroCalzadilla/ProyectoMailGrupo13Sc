@@ -88,8 +88,7 @@ public class VacunasM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al crear la vacuna: " + e.getMessage(), e);
         }
     }
 
@@ -108,15 +107,20 @@ public class VacunasM {
                 vacuna.setCreadoEn(rs.getTimestamp("created_at"));
                 vacuna.setActualizadoEn(rs.getTimestamp("updated_at"));
                 return vacuna;
+            } else {
+                throw new IllegalArgumentException("No existe una vacuna con el ID proporcionado: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Error al leer la vacuna: " + e.getMessage(), e);
         }
-        return null; // Si no se encuentra la vacuna
     }
 
     // Actualizar una vacuna
     public boolean actualizarVacuna() {
+        if (!existeVacuna(id)) {
+            throw new IllegalArgumentException("No existe una vacuna con el ID proporcionado: " + id);
+        }
+
         String sql = "UPDATE vaccinations SET vaccine = ?, duration_days = ?, notes = ?, updated_at = ? WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, vacuna);
@@ -127,21 +131,23 @@ public class VacunasM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al actualizar la vacuna: " + e.getMessage(), e);
         }
     }
 
     // Eliminar una vacuna
     public boolean eliminarVacuna(int id) {
+        if (!existeVacuna(id)) {
+            throw new IllegalArgumentException("No existe una vacuna con el ID proporcionado: " + id);
+        }
+
         String sql = "DELETE FROM vaccinations WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al eliminar la vacuna: " + e.getMessage(), e);
         }
     }
 
@@ -165,5 +171,20 @@ public class VacunasM {
             e.printStackTrace();
         }
         return vacunas;
+    }
+
+    // Verificar si una vacuna existe por ID
+    private boolean existeVacuna(int id) {
+        String sql = "SELECT COUNT(*) FROM vaccinations WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

@@ -77,6 +77,13 @@ public class HistorialVacunasM {
 
     // Crear un historial de vacunación
     public boolean crearHistorialVacuna() {
+        if (!existeMascota(petId)) {
+            throw new IllegalArgumentException("No existe una mascota con el ID proporcionado: " + petId);
+        }
+        if (!existeVacuna(vaccinationId)) {
+            throw new IllegalArgumentException("No existe una vacuna con el ID proporcionado: " + vaccinationId);
+        }
+
         String sql = "INSERT INTO vaccinate_history (pet_id, vaccination_id, created_at, updated_at, next_due_date) " +
                 "VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -88,8 +95,7 @@ public class HistorialVacunasM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al crear el historial de vacunación: " + e.getMessage(), e);
         }
     }
 
@@ -108,15 +114,26 @@ public class HistorialVacunasM {
                 historial.setActualizadoEn(rs.getTimestamp("updated_at"));
                 historial.setSiguienteFechaVencimiento(rs.getDate("next_due_date"));
                 return historial;
+            } else {
+                throw new IllegalArgumentException("No existe un historial de vacunación con el ID proporcionado: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Error al leer el historial de vacunación: " + e.getMessage(), e);
         }
-        return null; // Si no se encuentra el historial
     }
 
     // Actualizar un historial de vacunación
     public boolean actualizarHistorialVacuna() {
+        if (!existeHistorialVacuna(id)) {
+            throw new IllegalArgumentException("No existe un historial de vacunación con el ID proporcionado: " + id);
+        }
+        if (!existeMascota(petId)) {
+            throw new IllegalArgumentException("No existe una mascota con el ID proporcionado: " + petId);
+        }
+        if (!existeVacuna(vaccinationId)) {
+            throw new IllegalArgumentException("No existe una vacuna con el ID proporcionado: " + vaccinationId);
+        }
+
         String sql = "UPDATE vaccinate_history SET pet_id = ?, vaccination_id = ?, updated_at = ?, next_due_date = ? WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, petId);
@@ -127,21 +144,23 @@ public class HistorialVacunasM {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al actualizar el historial de vacunación: " + e.getMessage(), e);
         }
     }
 
     // Eliminar un historial de vacunación
     public boolean eliminarHistorialVacuna(int id) {
+        if (!existeHistorialVacuna(id)) {
+            throw new IllegalArgumentException("No existe un historial de vacunación con el ID proporcionado: " + id);
+        }
+
         String sql = "DELETE FROM vaccinate_history WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new IllegalArgumentException("Error al eliminar el historial de vacunación: " + e.getMessage(), e);
         }
     }
 
@@ -165,5 +184,50 @@ public class HistorialVacunasM {
             e.printStackTrace();
         }
         return historiales;
+    }
+
+    // Verificar si un historial de vacunación existe por ID
+    private boolean existeHistorialVacuna(int id) {
+        String sql = "SELECT COUNT(*) FROM vaccinate_history WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Verificar si una mascota existe por ID
+    private boolean existeMascota(int petId) {
+        String sql = "SELECT COUNT(*) FROM pets WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, petId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Verificar si una vacuna existe por ID
+    private boolean existeVacuna(int vaccinationId) {
+        String sql = "SELECT COUNT(*) FROM vaccinations WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, vaccinationId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
