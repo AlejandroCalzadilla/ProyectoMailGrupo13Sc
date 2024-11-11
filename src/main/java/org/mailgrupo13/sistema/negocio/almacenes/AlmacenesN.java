@@ -25,6 +25,11 @@ public class AlmacenesN {
 
 
 
+   public AlmacenesN leerAlmacen(int id) throws SQLException {
+        return almacenesService.leerAlmacen(id);
+   }
+
+
     public String obtenerAlmacenes() throws SQLException {
         return almacenesService.obtenerAlmacenes();
     }
@@ -94,7 +99,10 @@ public class AlmacenesN {
         this.actualizadoEn = actualizadoEn;
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return "Almacen: " + "id=" + id + ", nombre='" + nombre + '\'' + ", ubicacion='" + ubicacion + '\'' +
+                ", descripcion='" + descripcion + '\'' + ", creadoEn=" + creadoEn +
+                ", actualizadoEn=" + actualizadoEn ;
+    }
 }

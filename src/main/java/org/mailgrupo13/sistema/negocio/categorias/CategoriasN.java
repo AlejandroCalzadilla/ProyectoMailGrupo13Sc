@@ -22,6 +22,10 @@ public class CategoriasN {
 
 
 
+    public CategoriasN leerCategoria(int id) throws SQLException {
+        return categoriasService.leerCategoria(id);
+    }
+
     public String obtenerCategorias() throws SQLException {
         return categoriasService.obtenerCategorias();
     }
@@ -76,5 +80,13 @@ public class CategoriasN {
         this.actualizadoEn = actualizadoEn;
     }
 
-
+    @Override
+    public String toString() {
+        return "CategoriasN{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", creadoEn=" + creadoEn +
+                ", actualizadoEn=" + actualizadoEn +
+                '}';
+    }
 }

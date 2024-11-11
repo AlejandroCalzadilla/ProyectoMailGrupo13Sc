@@ -137,7 +137,11 @@ public class CategoriasM {
             deleteStmt.executeUpdate();
             return "Categoría eliminada";
         } catch (SQLException e) {
-            throw new IllegalArgumentException("Error al eliminar la categoría: " + e.getMessage(), e);
+            if (e.getMessage().contains("violates foreign key constraint")) {
+                throw new IllegalArgumentException("No se puede eliminar la categoría porque está siendo referenciada por otros registros.");
+            } else {
+                throw new IllegalArgumentException("Error al eliminar la categoría: " + e.getMessage());
+            }
         }
     }
 
@@ -174,5 +178,16 @@ public class CategoriasM {
             e.printStackTrace();
         }
         return false;
+
+    }
+
+    @Override
+    public String toString() {
+        return "CategoriasM{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", creadoEn=" + creadoEn +
+                ", actualizadoEn=" + actualizadoEn +
+                '}';
     }
 }

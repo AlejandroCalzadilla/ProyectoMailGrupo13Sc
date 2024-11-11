@@ -75,6 +75,83 @@ public class TratamientosM {
 
     // Métodos CRUD
 
+
+    public boolean agregarConsultaConTratamientos(Date fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId, List<TratamientosM> tratamientos) throws SQLException {
+
+        try {
+            //conn = DriverManager.getConnection("jdbc:your_database_url");
+            conn.setAutoCommit(false);
+
+            // Create consultation
+            String consultaSql = "INSERT INTO medical_consultations (date, reason, diagnosis, consultation_fee, pet_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement consultaStmt = conn.prepareStatement(consultaSql, Statement.RETURN_GENERATED_KEYS)) {
+                consultaStmt.setDate(1, fecha);
+                consultaStmt.setString(2, motivo);
+                consultaStmt.setString(3, diagnostico);
+                consultaStmt.setFloat(4, tarifaConsulta);
+                consultaStmt.setInt(5, petId);
+                consultaStmt.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+                consultaStmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+                consultaStmt.executeUpdate();
+
+                ResultSet generatedKeys = consultaStmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int consultaId = generatedKeys.getInt(1);
+
+                    // Create treatments
+                    String tratamientoSql = "INSERT INTO treatments (medication, notes, consultation_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?)";
+                    try (PreparedStatement tratamientoStmt = conn.prepareStatement(tratamientoSql)) {
+                        for (TratamientosM tratamiento : tratamientos) {
+                            tratamientoStmt.setString(1, tratamiento.getMedicamento());
+                            tratamientoStmt.setString(2, tratamiento.getNotas());
+                            tratamientoStmt.setInt(3, consultaId);
+                            tratamientoStmt.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+                            tratamientoStmt.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+                            tratamientoStmt.executeUpdate();
+                        }
+                    }
+                }
+            }
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            if (conn != null) {
+                conn.rollback();
+
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                conn.setAutoCommit(true);
+                conn.close();
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // Crear un tratamiento
     public boolean crearTratamiento() {
         if (!existeConsulta(consultaId)) {
@@ -119,7 +196,7 @@ public class TratamientosM {
         }
     }
 
-    // Actualizar un tratamiento
+    /*
     public boolean actualizarTratamiento() {
         if (!existeTratamiento(id)) {
             throw new IllegalArgumentException("No existe un tratamiento con el ID proporcionado: " + id);
@@ -142,7 +219,10 @@ public class TratamientosM {
         }
     }
 
+     */
+
     // Eliminar un tratamiento
+    /*
     public boolean eliminarTratamiento(int id) {
         if (!existeTratamiento(id)) {
             throw new IllegalArgumentException("No existe un tratamiento con el ID proporcionado: " + id);
@@ -156,7 +236,7 @@ public class TratamientosM {
         } catch (SQLException e) {
             throw new IllegalArgumentException("Error al eliminar el tratamiento: " + e.getMessage(), e);
         }
-    }
+    }*/
 
     // Obtener todos los tratamientos
     public List<TratamientosM> obtenerTratamientos() {

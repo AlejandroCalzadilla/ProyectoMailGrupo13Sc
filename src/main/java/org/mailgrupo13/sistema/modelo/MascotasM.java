@@ -117,7 +117,7 @@ public class MascotasM {
     }
 
     // Actualizar una mascota
-    public boolean actualizarMascota() {
+    public String actualizarMascota() {
         if (!existeCliente(idCliente)) {
             throw new IllegalArgumentException("No existe un cliente con el ID proporcionado: " + idCliente);
         }
@@ -145,14 +145,14 @@ public class MascotasM {
             stmt.setTimestamp(8, actualizadoEn);
             stmt.setInt(9, id);
             stmt.executeUpdate();
-            return true;
+            return "Mascota actualizada con éxito";
         } catch (SQLException e) {
             throw new IllegalArgumentException("Error al actualizar la mascota: " + e.getMessage(), e);
         }
     }
 
     // Eliminar una mascota
-    public boolean eliminarMascota(int id) {
+    public String eliminarMascota(int id) {
         String checkSql = "SELECT COUNT(*) FROM pets WHERE id = ?";
         String deleteSql = "DELETE FROM pets WHERE id = ?";
         try (PreparedStatement checkStmt = conn.prepareStatement(checkSql);
@@ -165,7 +165,7 @@ public class MascotasM {
 
             deleteStmt.setInt(1, id);
             deleteStmt.executeUpdate();
-            return true;
+            return "Mascota eliminada con éxito";
         } catch (SQLException e) {
             throw new IllegalArgumentException("Error al eliminar la mascota: " + e.getMessage(), e);
         }

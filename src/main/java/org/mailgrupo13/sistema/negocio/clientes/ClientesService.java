@@ -5,10 +5,7 @@ import org.mailgrupo13.sistema.modelo.ClienteM;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +18,23 @@ public class ClientesService {
     }
 
 
-    public List<ClientesN> obtenerClientes() throws SQLException {
+
+    public  ClientesN leerCliente(int id) throws SQLException {
+        this.clienteM=this.clienteM.leerCliente(id);
+        ClientesN cliente=new ClientesN();
+        cliente.setId(this.clienteM.getId());
+        cliente.setNombre(this.clienteM.getNombre());
+        cliente.setApellido(this.clienteM.getApellido());
+        cliente.setTelefono(this.clienteM.getTelefono());
+        cliente.setGenero(this.clienteM.getGenero());
+        cliente.setFechaNacimiento(this.clienteM.getFechaNacimiento());
+        cliente.setIdUsuario(this.clienteM.getIdUsuario());
+        cliente.setCreadoEn(this.clienteM.getCreadoEn());
+        cliente.setActualizadoEn(this.clienteM.getActualizadoEn());
+        return cliente;
+    }
+
+    public String obtenerClientes() throws SQLException {
         return  mapear(clienteM.obtenerClientes());
     }
 
@@ -47,24 +60,24 @@ public class ClientesService {
     }
 
 
-    public List<ClientesN> mapear(List<ClienteM> clientesM) throws SQLException {
-        List<ClientesN> clientesN = new ArrayList<>();
-
+    public String mapear(List<ClienteM> clientesM) throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        String format = "%-5s %-10s %-10s %-15s %-10s %-15s %-10s %-30s %-30s%n";
+        sb.append(String.format(format, "ID", "Nombre", "Apellido", "Teléfono", "Género", "Fecha Nac.", "ID Usuario", "Creado En", "Actualizado En"));
+        sb.append("------------------------------------------------------------------------------------------------------------------------------------------------\n");
         for (ClienteM clienteM : clientesM) {
-            ClientesN clienteN = new ClientesN();
-            clienteN.setId(clienteM.getId());
-            clienteN.setNombre(clienteM.getNombre());
-            clienteN.setApellido(clienteM.getApellido());
-            clienteN.setTelefono(clienteM.getTelefono());
-            clienteN.setGenero(clienteM.getGenero());
-            clienteN.setFechaNacimiento(clienteM.getFechaNacimiento());
-            clienteN.setIdUsuario(clienteM.getIdUsuario());
-            clienteN.setCreadoEn(clienteM.getCreadoEn());
-            clienteN.setActualizadoEn(clienteM.getActualizadoEn());
-            clientesN.add(clienteN);
+            sb.append(String.format(format,
+                    clienteM.getId(),
+                    clienteM.getNombre(),
+                    clienteM.getApellido(),
+                    clienteM.getTelefono(),
+                    clienteM.getGenero(),
+                    clienteM.getFechaNacimiento(),
+                    clienteM.getIdUsuario(),
+                    clienteM.getCreadoEn(),
+                    clienteM.getActualizadoEn()));
         }
-
-        return clientesN;
+        return sb.toString();
     }
 
 
@@ -85,7 +98,7 @@ public class ClientesService {
 
 
 
-    // Método para validar la fecha en formato "yyyy-MM-dd"
+
 
 
 

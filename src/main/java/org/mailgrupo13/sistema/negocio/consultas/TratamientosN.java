@@ -86,6 +86,7 @@ public class TratamientosN {
         }
     }
 
+    /*
     public boolean actualizarTratamiento(int id, String medicamento, String notas, int consultaId) throws SQLException {
         try {
             validarCampos(medicamento, notas, consultaId);
@@ -97,9 +98,14 @@ public class TratamientosN {
         }
     }
 
+
+     */
+    /*
     public boolean eliminarTratamiento(int id) throws SQLException {
         return tratamientosM.eliminarTratamiento(id);
     }
+
+     */
 
     private List<TratamientosN> mapear(List<TratamientosM> tratamientosMList) throws SQLException {
         List<TratamientosN> tratamientosNList = new ArrayList<>();

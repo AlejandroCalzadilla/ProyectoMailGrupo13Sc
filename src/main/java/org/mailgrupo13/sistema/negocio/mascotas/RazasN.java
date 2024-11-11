@@ -1,5 +1,6 @@
 package org.mailgrupo13.sistema.negocio.mascotas;
 
+import org.mailgrupo13.sistema.modelo.EspeciesM;
 import org.mailgrupo13.sistema.modelo.RazasM;
 
 import java.sql.SQLException;
@@ -61,56 +62,77 @@ public class RazasN {
     }
 
     // CRUD Methods
-    public List<RazasN> obtenerRazas() throws SQLException {
+    public String obtenerRazas() throws SQLException {
         return mapear(razasM.obtenerRazas());
     }
 
+
+    public RazasN leerRaza(int id ) throws SQLException {
+
+        RazasM razam= razasM.leerRaza(id);
+        RazasN razaN= new RazasN();
+        razaN.setId(razam.getId());
+        razaN.setNombre(razam.getNombre());
+        razaN.setIdEspecie(razam.getIdEspecie());
+        razaN.setCreadoEn(razam.getCreadoEn());
+        razaN.setActualizadoEn(razam.getActualizadoEn());
+       return razaN;
+
+    }
+
+
+
     public String agregarRaza(String nombre, int idEspecie) throws SQLException {
-        try {
             validarCampos(nombre, idEspecie);
             RazasM razasMObj = cargar(0, nombre, idEspecie);
             razasMObj.crearRaza();
             return "Raza agregada con éxito";
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return "Error al agregar la raza: " + e.getMessage();
-        }
+
     }
 
     public boolean actualizarRaza(int id, String nombre, int idEspecie) throws SQLException {
-        try {
             validarCampos(nombre, idEspecie);
             RazasM razasMObj = cargar(id, nombre, idEspecie);
             return razasMObj.actualizarRaza();
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
+
     }
 
     public boolean eliminarRaza(int id) throws SQLException {
         return razasM.eliminarRaza(id);
     }
 
-    private List<RazasN> mapear(List<RazasM> razasMList) throws SQLException {
-        List<RazasN> razasNList = new ArrayList<>();
+
+
+    private String mapear(List<RazasM> razasMList) throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        String format = "%-5s %-20s %-10s  %-20s %-30s %-30s%n";
+        sb.append(String.format(format, "ID", "Nombre", "ID Especie","especie" ,  "Creado En", "Actualizado En"));
+        sb.append("--------------------------------------------------------------------------------------------\n");
         for (RazasM razasM : razasMList) {
-            RazasN razasN = new RazasN();
-            razasN.setId(razasM.getId());
-            razasN.setNombre(razasM.getNombre());
-            razasN.setIdEspecie(razasM.getIdEspecie());
-            razasN.setCreadoEn(razasM.getCreadoEn());
-            razasN.setActualizadoEn(razasM.getActualizadoEn());
-            razasNList.add(razasN);
+            sb.append(String.format(format,
+                    razasM.getId(),
+                    razasM.getNombre(),
+                    razasM.getIdEspecie(),
+                    cargarEspecie(razasM.getIdEspecie()),
+                    razasM.getCreadoEn(),
+                    razasM.getActualizadoEn()));
         }
-        return razasNList;
+        return sb.toString();
     }
+
+     private String cargarEspecie(int id ) throws SQLException {
+        EspeciesN especieN = new EspeciesN();
+        return especieN.leerEspecie(id).getNombre();
+
+
+     }
 
     private RazasM cargar(int id, String nombre, int idEspecie) throws SQLException {
         RazasM razasMObj = new RazasM();
         razasMObj.setId(id);
         razasMObj.setNombre(nombre);
         razasMObj.setIdEspecie(idEspecie);
+
         razasMObj.setCreadoEn(Timestamp.valueOf(java.time.LocalDateTime.now()));
         razasMObj.setActualizadoEn(Timestamp.valueOf(java.time.LocalDateTime.now()));
         return razasMObj;
@@ -125,6 +147,21 @@ public class RazasN {
         }
         if (nombre.length() < 3) {
             throw new IllegalArgumentException("El nombre es muy corto");
+        }
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return "Raza : " + "id=" + id +
+                    ", nombre='" + nombre + '\'' +
+                    ", idEspecie=" + idEspecie +
+                    ",  especie= "+  cargarEspecie(idEspecie)   +
+                    ", creadoEn=" + creadoEn +
+                    ", actualizadoEn=" + actualizadoEn +
+                    '}';
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

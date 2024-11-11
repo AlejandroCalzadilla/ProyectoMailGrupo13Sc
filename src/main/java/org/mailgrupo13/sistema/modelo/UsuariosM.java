@@ -75,18 +75,21 @@ public class UsuariosM {
     // Métodos CRUD
 
     // Crear un usuario
-    public boolean crearUsuario() {
-        String sql = "INSERT INTO users (email, password, name, created_at, updated_at) VALUES (?, ?, ?, ?, ?)";
+    public String crearUsuario() {
+        String sql = "INSERT INTO users (email, password, name) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, email);
             stmt.setString(2, password);
             stmt.setString(3, nombre);
-            stmt.setTimestamp(4, creadoEn);
-            stmt.setTimestamp(5, actualizadoEn);
+
             stmt.executeUpdate();
-            return true;
+            return "Usuario creado con éxito";
         } catch (SQLException e) {
-            throw new IllegalArgumentException("Error al crear el usuario: " + e.getMessage(), e);
+            if (e.getMessage().contains("duplicate key value violates unique constraint")) {
+                throw new IllegalArgumentException("El email ya está registrado: " + email);
+            } else {
+                throw new IllegalArgumentException("Error al crear el usuario: " + e.getMessage(), e);
+            }
         }
     }
 
@@ -102,8 +105,7 @@ public class UsuariosM {
                 usuario.setEmail(rs.getString("email"));
                 usuario.setPassword("********"); // Placeholder value
                 usuario.setNombre(rs.getString("name"));
-                usuario.setCreadoEn(rs.getTimestamp("created_at"));
-                usuario.setActualizadoEn(rs.getTimestamp("updated_at"));
+
                 return usuario;
             } else {
                 throw new IllegalArgumentException("No existe un usuario con el ID proporcionado: " + id);
@@ -114,36 +116,38 @@ public class UsuariosM {
     }
 
     // Actualizar un usuario
-    public boolean actualizarUsuario() {
+    public String actualizarUsuario() {
         if (!existeUsuario(id)) {
             throw new IllegalArgumentException("No existe un usuario con el ID proporcionado: " + id);
         }
 
-        String sql = "UPDATE users SET email = ?, password = ?, name = ?, updated_at = ? WHERE id = ?";
+        String sql = "UPDATE users SET email = ?, password = ?, name = ? WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, email);
             stmt.setString(2, password);
             stmt.setString(3, nombre);
-            stmt.setTimestamp(4, actualizadoEn);
-            stmt.setInt(5, id);
+            stmt.setInt(4, id);
             stmt.executeUpdate();
-            return true;
+            return "Usuario actualizado con éxito";
         } catch (SQLException e) {
-            throw new IllegalArgumentException("Error al actualizar el usuario: " + e.getMessage(), e);
+            if (e.getMessage().contains("duplicate key value violates unique constraint")) {
+                throw new IllegalArgumentException("El email ya está registrado: " + email);
+            } else {
+                throw new IllegalArgumentException("Error al actualizar el usuario: " + e.getMessage(), e);
+            }
         }
     }
 
     // Eliminar un usuario
-    public boolean eliminarUsuario(int id) {
+    public String eliminarUsuario(int id) {
         if (!existeUsuario(id)) {
             throw new IllegalArgumentException("No existe un usuario con el ID proporcionado: " + id);
         }
-
         String sql = "DELETE FROM users WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
-            return true;
+            return "Usuario eliminado con éxito";
         } catch (SQLException e) {
             throw new IllegalArgumentException("Error al eliminar el usuario: " + e.getMessage(), e);
         }
@@ -161,8 +165,6 @@ public class UsuariosM {
                 usuario.setEmail(rs.getString("email"));
                 usuario.setPassword("********"); // Placeholder value
                 usuario.setNombre(rs.getString("name"));
-                usuario.setCreadoEn(rs.getTimestamp("created_at"));
-                usuario.setActualizadoEn(rs.getTimestamp("updated_at"));
                 usuarios.add(usuario);
             }
         } catch (SQLException e) {

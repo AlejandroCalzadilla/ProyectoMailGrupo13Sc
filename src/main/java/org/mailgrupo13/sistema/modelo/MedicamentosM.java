@@ -103,7 +103,7 @@ public class MedicamentosM {
     // Métodos CRUD
 
     // Crear un medicamento
-    public boolean crearMedicamento() {
+    public String crearMedicamento() {
         String sql = "INSERT INTO medicaments (name, dosage, manufacturer, expiration_date, controlled_substance, category_id, created_at, updated_at) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -116,39 +116,40 @@ public class MedicamentosM {
             stmt.setTimestamp(7, creadoEn);
             stmt.setTimestamp(8, actualizadoEn);
             stmt.executeUpdate();
-            return true;
+            return "Medicamento creado";
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return "Error al crear el medicamento";
         }
     }
 
     // Leer un medicamento por ID
-    public boolean leerMedicamento(int id) {
+    public MedicamentosM leerMedicamento(int id) {
         String sql = "SELECT * FROM medicaments WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                this.id = rs.getInt("id");
-                nombre = rs.getString("name");
-                dosis = rs.getString("dosage");
-                fabricante = rs.getString("manufacturer");
-                fechaCaducidad = rs.getDate("expiration_date");
-                sustanciaControlada = rs.getBoolean("controlled_substance");
-                categoriaId = rs.getInt("category_id");
-                creadoEn = rs.getTimestamp("created_at");
-                actualizadoEn = rs.getTimestamp("updated_at");
-                return true;
+                MedicamentosM medicamento = new MedicamentosM();
+                medicamento.setId(rs.getInt("id"));
+                medicamento.setNombre(rs.getString("name"));
+                medicamento.setDosis(rs.getString("dosage"));
+                medicamento.setFabricante(rs.getString("manufacturer"));
+                medicamento.setFechaCaducidad(rs.getDate("expiration_date"));
+                medicamento.setSustanciaControlada(rs.getBoolean("controlled_substance"));
+                medicamento.setCategoriaId(rs.getInt("category_id"));
+                medicamento.setCreadoEn(rs.getTimestamp("created_at"));
+                medicamento.setActualizadoEn(rs.getTimestamp("updated_at"));
+                return medicamento;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
     // Actualizar un medicamento
-    public boolean actualizarMedicamento() {
+    public String actualizarMedicamento() {
         String sql = "UPDATE medicaments SET name = ?, dosage = ?, manufacturer = ?, expiration_date = ?, " +
                 "controlled_substance = ?, category_id = ?, updated_at = ? WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -161,23 +162,23 @@ public class MedicamentosM {
             stmt.setTimestamp(7, actualizadoEn);
             stmt.setInt(8, id);
             stmt.executeUpdate();
-            return true;
+            return "Medicamento actualizado";
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return "Error al actualizar el medicamento";
         }
     }
 
     // Eliminar un medicamento
-    public boolean eliminarMedicamento(int id) {
+    public String eliminarMedicamento(int id) {
         String sql = "DELETE FROM medicaments WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
-            return true;
+            return "Medicamento eliminado";
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return "Error al eliminar el medicamento";
         }
     }
 

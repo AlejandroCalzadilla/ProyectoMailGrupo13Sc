@@ -16,7 +16,17 @@ public class CategoriaService {
 
       }
 
-
+   public CategoriasN leerCategoria(int id) throws SQLException {
+          CategoriasM categoriaM = new CategoriasM();
+           categoriaM=categoriasM.leerCategoria(id);
+          //System.out.println(categoriaM.toString()+"llega correcto");
+          CategoriasN categoriasN = new CategoriasN();
+            categoriasN.setId(categoriaM.getId());
+            categoriasN.setNombre(categoriaM.getNombre());
+            categoriasN.setCreadoEn(categoriaM.getCreadoEn());
+            categoriasN.setActualizadoEn(categoriaM.getActualizadoEn());
+            return categoriasN;
+      }
 
     public String obtenerCategorias() throws SQLException {
         return mapeard(categoriasM.obtenerCategorias());
@@ -44,7 +54,7 @@ public class CategoriaService {
 
     public String mapeard(List<CategoriasM> especiesM) throws SQLException {
         StringBuilder sb = new StringBuilder();
-        String format = "%-5s %-10s %-30s %-30s%n";
+        String format = "%-5s %-30s %-30s %-30s%n";
         sb.append(String.format(format, "ID", "Nombre", "Creado En", "Actualizado En"));
         sb.append("---------------------------------------------------------------------------\n");
         for (CategoriasM especieM : especiesM) {

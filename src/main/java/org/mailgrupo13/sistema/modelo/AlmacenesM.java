@@ -75,7 +75,7 @@ public class AlmacenesM {
     public String crearAlmacen() {
 
         if (existeAlmacen(nombre)) {
-            throw new IllegalArgumentException("Ya existe una especie con el mismo nombre: " + nombre);
+            throw new IllegalArgumentException("Ya existe una almacen con el mismo nombre: " + nombre);
         }
 
         String sql = "INSERT INTO warehouses (name, location, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?)";
@@ -178,6 +178,10 @@ public class AlmacenesM {
     }
 
     public String actualizarAlmacen() {
+        if (existeAlmacen(nombre)) {
+            throw new IllegalArgumentException("Ya existe una almacen con el mismo nombre: " + nombre);
+        }
+
         String checkSql = "SELECT COUNT(*) FROM warehouses WHERE id = ?";
         String updateSql = "UPDATE warehouses SET name = ?, location = ?, description = ?, updated_at = ? WHERE id = ?";
         try (PreparedStatement checkStmt = conn.prepareStatement(checkSql);

@@ -15,10 +15,7 @@ public class EspeciesN {
 
     @Override
     public String toString() {
-        return "EspeciesN{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                '}';
+        return "Especie: " + "id=" + id + ", nombre='" + nombre + '\'' ;
     }
 
     public EspeciesN( ) throws SQLException {

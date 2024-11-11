@@ -103,7 +103,12 @@ public class ClientesN {
        clientesService = new ClientesService(clienteM);
     }
 
-    public List<ClientesN> obtenerClientes() throws SQLException {
+
+    public ClientesN leerCliente(int id ) throws SQLException {
+        return clientesService.leerCliente(id);
+    }
+
+    public String obtenerClientes() throws SQLException {
        return clientesService.obtenerClientes();
     }
 
@@ -121,6 +126,16 @@ public class ClientesN {
         return clienteM.eliminarCliente(id);
     }
 
-
-
+    @Override
+    public String toString() {
+        return "ClientesN{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", telefono='" + telefono + '\'' +
+                ", genero='" + genero + '\'' +
+                ", fechaNacimiento=" + fechaNacimiento +
+                ", idUsuario=" + idUsuario +
+                '}';
+    }
 }

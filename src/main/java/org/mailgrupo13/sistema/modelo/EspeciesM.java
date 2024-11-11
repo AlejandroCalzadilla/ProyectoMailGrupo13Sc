@@ -93,6 +93,8 @@ public class EspeciesM {
             }
         } catch (SQLException e) {
             throw new IllegalArgumentException("Error al leer la especie: " + e.getMessage(), e);
+
+
         }
     }
 
@@ -138,7 +140,11 @@ public class EspeciesM {
             deleteStmt.executeUpdate();
             return "especie eliminada";
         } catch (SQLException e) {
-            throw new IllegalArgumentException("Error al eliminar la especie: " + e.getMessage(), e);
+            if (e.getMessage().contains("violates foreign key constraint")) {
+                throw new IllegalArgumentException("No se puede eliminar la especie porque está siendo referenciada por otros registros.");
+            } else {
+                throw new IllegalArgumentException("Error al eliminar la especie: " + e.getMessage());
+            }
         }
     }
 

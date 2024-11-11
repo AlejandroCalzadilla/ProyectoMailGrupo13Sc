@@ -92,6 +92,16 @@ public class ConsultasMedicasN {
         return mapear(consultasMedicasM.obtenerConsultasMedicas());
     }
 
+
+
+
+
+
+
+
+
+
+   /*
     public String agregarConsultaMedica(java.sql.Date fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId) throws SQLException {
         try {
             validarCampos(fecha, motivo, diagnostico, tarifaConsulta, petId);
@@ -104,6 +114,10 @@ public class ConsultasMedicasN {
         }
     }
 
+    */
+
+
+    /*
     public boolean actualizarConsultaMedica(int id, java.sql.Date fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId) throws SQLException {
         try {
             validarCampos(fecha, motivo, diagnostico, tarifaConsulta, petId);
@@ -115,8 +129,13 @@ public class ConsultasMedicasN {
         }
     }
 
+
+     */
+
+
+
     public boolean eliminarConsultaMedica(int id) throws SQLException {
-        return consultasMedicasM.eliminarConsultaMedica(id);
+        return consultasMedicasM.eliminarConsultaConTratamientos(id);
     }
 
     private List<ConsultasMedicasN> mapear(List<ConsultasMedicasM> consultasMedicasMList) throws SQLException {

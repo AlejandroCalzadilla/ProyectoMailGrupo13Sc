@@ -63,7 +63,7 @@ public class ClienteM {
       throw new IllegalArgumentException("No existe un usuario con el ID proporcionado: " + idUsuario);
     }
 
-    String sql = "INSERT INTO customers (first_name, last_name, phone_number, gender, birthdate, id_user, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    String sql = "INSERT INTO customers (first_name, last_name, phone_number, gender, birthdate, user_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     try (PreparedStatement stmt = conn.prepareStatement(sql)) {
       stmt.setString(1, nombre);
       stmt.setString(2, apellido);
@@ -93,7 +93,7 @@ public class ClienteM {
         cliente.setTelefono(rs.getString("phone_number"));
         cliente.setGenero(rs.getString("gender"));
         cliente.setFechaNacimiento(rs.getDate("birthdate"));
-        cliente.setIdUsuario(rs.getInt("id_user"));
+        cliente.setIdUsuario(rs.getInt("user_id"));
         cliente.setCreadoEn(rs.getTimestamp("created_at"));
         cliente.setActualizadoEn(rs.getTimestamp("updated_at"));
         clientes.add(cliente);
@@ -105,22 +105,23 @@ public class ClienteM {
   }
 
   // Leer un cliente por ID
-  public boolean leerCliente(int id) {
+  public ClienteM leerCliente(int id) {
     String sql = "SELECT * FROM customers WHERE id = ?";
     try (PreparedStatement stmt = conn.prepareStatement(sql)) {
       stmt.setInt(1, id);
       ResultSet rs = stmt.executeQuery();
       if (rs.next()) {
-        this.id = rs.getInt("id");
-        nombre = rs.getString("first_name");
-        apellido = rs.getString("last_name");
-        telefono = rs.getString("phone_number");
-        genero = rs.getString("gender");
-        fechaNacimiento = rs.getDate("birthdate");
-        idUsuario = rs.getInt("id_user");
-        creadoEn = rs.getTimestamp("created_at");
-        actualizadoEn = rs.getTimestamp("updated_at");
-        return true;
+        ClienteM cliente = new ClienteM();
+        cliente.setId(rs.getInt("id"));
+        cliente.setNombre(rs.getString("first_name"));
+        cliente.setApellido(rs.getString("last_name"));
+        cliente.setTelefono(rs.getString("phone_number"));
+        cliente.setGenero(rs.getString("gender"));
+        cliente.setFechaNacimiento(rs.getDate("birthdate"));
+        cliente.setIdUsuario(rs.getInt("user_id"));
+        cliente.setCreadoEn(rs.getTimestamp("created_at"));
+        cliente.setActualizadoEn(rs.getTimestamp("updated_at"));
+        return cliente;
       } else {
         throw new IllegalArgumentException("No existe un cliente con el ID proporcionado: " + id);
       }
@@ -136,7 +137,7 @@ public class ClienteM {
     }
 
     String checkSql = "SELECT COUNT(*) FROM customers WHERE id = ?";
-    String sql = "UPDATE customers SET first_name = ?, last_name = ?, phone_number = ?, gender = ?, birthdate = ?, id_user = ?, updated_at = ? WHERE id = ?";
+    String sql = "UPDATE customers SET first_name = ?, last_name = ?, phone_number = ?, gender = ?, birthdate = ?, user_id = ?, updated_at = ? WHERE id = ?";
     try (PreparedStatement checkStmt = conn.prepareStatement(checkSql);
          PreparedStatement stmt = conn.prepareStatement(sql)) {
       checkStmt.setInt(1, id);

@@ -1,6 +1,9 @@
 package org.mailgrupo13.sistema.negocio.almacenes;
 
 import org.mailgrupo13.sistema.modelo.AlmacenesM;
+import org.mailgrupo13.sistema.modelo.EspeciesM;
+import org.mailgrupo13.sistema.negocio.mascotas.EspeciesN;
+
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
@@ -14,6 +17,24 @@ public class AlmacenesService {
        this.almacenesM=almacenesM;
 
     }
+
+
+
+    public  AlmacenesN leerAlmacen(int id) throws SQLException {
+        AlmacenesM especieMObj = almacenesM.leerAlmacen(id);
+        AlmacenesN especieN = new AlmacenesN();
+        especieN.setId(especieMObj.getId());
+        especieN.setNombre(especieMObj.getNombre());
+        especieN.setDescripcion(especieMObj.getDescripcion());
+        especieN.setUbicacion(especieMObj.getUbicacion());
+        especieN.setCreadoEn(especieMObj.getCreadoEn());
+        especieN.setActualizadoEn(especieMObj.getActualizadoEn());
+        return especieN;
+
+    }
+
+
+
     public String obtenerAlmacenes() throws SQLException {
         return mapear2(almacenesM.obtenerAlmacenes());
     }
@@ -39,7 +60,7 @@ public class AlmacenesService {
 
     public String mapear2(List<AlmacenesM> almacenesM) throws SQLException {
         StringBuilder sb = new StringBuilder();
-        String format = "%-5s %-10s %-20s %-20s  %-30s%n";
+        String format = "%-5s %-10s %-30s  %-30s%n";
         sb.append(String.format(format, "ID", "Nombre", "Ubicacion", "Descpripcion"));
         sb.append("---------------------------------------------------------------------------\n");
         for (AlmacenesM almacenM : almacenesM) {
@@ -47,7 +68,8 @@ public class AlmacenesService {
                     almacenM.getId(),
                     almacenM.getNombre(),
                     almacenM.getUbicacion(),
-                    almacenM.getDescripcion()
+                    almacenM.getDescripcion(),
+                    almacenM.getCreadoEn()
             ));
         }
         return sb.toString();
