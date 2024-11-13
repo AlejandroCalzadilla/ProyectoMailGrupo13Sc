@@ -119,30 +119,49 @@ public class NotaVentaM {
 
 
     // Create a sales note and update inventory
-    public void crearNotaVenta(NotaVentaM notaVenta, List<DetalleNotaVentaM> detalles) throws SQLException {
+    public String crearNotaVenta(NotaVentaM notaVenta, List<DetalleNotaVentaM> detalles) throws SQLException {
         String sqlNotaVenta = "INSERT INTO sales_notes (sale_date, total_amount, warehouse_id, user_id, customer_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmtNotaVenta = conn.prepareStatement(sqlNotaVenta, Statement.RETURN_GENERATED_KEYS)) {
-            stmtNotaVenta.setDate(1, notaVenta.getFechaVenta());
-            stmtNotaVenta.setFloat(2, notaVenta.getTotalMonto());
-            stmtNotaVenta.setInt(3, notaVenta.getWarehouseId());
-            stmtNotaVenta.setInt(4, notaVenta.getUserId());
-            stmtNotaVenta.setInt(5, notaVenta.getCustomerId());
-            stmtNotaVenta.setTimestamp(6, notaVenta.getCreadoEn());
-            stmtNotaVenta.setTimestamp(7, notaVenta.getActualizadoEn());
-            stmtNotaVenta.executeUpdate();
+        try {
+            conn.setAutoCommit(false); // Start transaction
 
-            ResultSet generatedKeys = stmtNotaVenta.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                notaVenta.setId(generatedKeys.getInt(1));
-            }
+            try (PreparedStatement stmtNotaVenta = conn.prepareStatement(sqlNotaVenta, Statement.RETURN_GENERATED_KEYS)) {
+                stmtNotaVenta.setDate(1, notaVenta.getFechaVenta());
+                stmtNotaVenta.setFloat(2, notaVenta.getTotalMonto());
+                stmtNotaVenta.setInt(3, notaVenta.getWarehouseId());
+                stmtNotaVenta.setInt(4, notaVenta.getUserId());
+                stmtNotaVenta.setInt(5, notaVenta.getCustomerId());
+                stmtNotaVenta.setTimestamp(6, notaVenta.getCreadoEn());
+                stmtNotaVenta.setTimestamp(7, notaVenta.getActualizadoEn());
+                stmtNotaVenta.executeUpdate();
 
-            for (DetalleNotaVentaM detalle : detalles) {
-                detalle.setIdNotaVenta(notaVenta.getId());
-                detalle.crearDetalleNotaVenta();
-                actualizarInventario(detalle);
+                ResultSet generatedKeys = stmtNotaVenta.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    notaVenta.setId(generatedKeys.getInt(1));
+                }
+
+                for (DetalleNotaVentaM detalle : detalles) {
+                    detalle.setIdNotaVenta(notaVenta.getId());
+                    detalle.crearDetalleNotaVenta();
+                    actualizarInventario(detalle);
+                }
+
+                conn.commit(); // Commit transaction
+                return "Nota de venta creada con éxito";
+            } catch (SQLException e) {
+                conn.rollback(); // Rollback transaction on error
+                throw new SQLException("Error al crear la nota de venta: " + e.getMessage(), e);
+            } finally {
+                conn.setAutoCommit(true); // Reset auto-commit mode
             }
+        } catch (SQLException e) {
+            throw new SQLException("Error al manejar la transacción: " + e.getMessage(), e);
         }
     }
+
+
+
+
+
 
     // Read a sales note by ID
     public NotaVentaM leerNotaVenta(int id) throws SQLException {
@@ -169,27 +188,41 @@ public class NotaVentaM {
 
     // Update a sales note
     // Update a sales note and its details
-    public void actualizarNotaVenta(NotaVentaM notaVenta, List<DetalleNotaVentaM> detalles) throws SQLException {
+    public String actualizarNotaVenta(NotaVentaM notaVenta, List<DetalleNotaVentaM> detalles) throws SQLException {
         String sqlNotaVenta = "UPDATE sales_notes SET sale_date = ?, total_amount = ?, warehouse_id = ?, user_id = ?, customer_id = ?, updated_at = ? WHERE id = ?";
-        try (PreparedStatement stmtNotaVenta = conn.prepareStatement(sqlNotaVenta)) {
-            stmtNotaVenta.setDate(1, notaVenta.getFechaVenta());
-            stmtNotaVenta.setFloat(2, notaVenta.getTotalMonto());
-            stmtNotaVenta.setInt(3, notaVenta.getWarehouseId());
-            stmtNotaVenta.setInt(4, notaVenta.getUserId());
-            stmtNotaVenta.setInt(5, notaVenta.getCustomerId());
-            stmtNotaVenta.setTimestamp(6, notaVenta.getActualizadoEn());
-            stmtNotaVenta.setInt(7, notaVenta.getId());
-            stmtNotaVenta.executeUpdate();
+        try {
+            conn.setAutoCommit(false); // Start transaction
 
-            for (DetalleNotaVentaM detalle : detalles) {
-                detalle.setIdNotaVenta(notaVenta.getId());
-                if (detalle.existeDetalleNotaVenta(detalle.getId())) {
-                    detalle.actualizarDetalleNotaVenta();
-                } else {
-                    detalle.crearDetalleNotaVenta();
+            try (PreparedStatement stmtNotaVenta = conn.prepareStatement(sqlNotaVenta)) {
+                stmtNotaVenta.setDate(1, notaVenta.getFechaVenta());
+                stmtNotaVenta.setFloat(2, notaVenta.getTotalMonto());
+                stmtNotaVenta.setInt(3, notaVenta.getWarehouseId());
+                stmtNotaVenta.setInt(4, notaVenta.getUserId());
+                stmtNotaVenta.setInt(5, notaVenta.getCustomerId());
+                stmtNotaVenta.setTimestamp(6, notaVenta.getActualizadoEn());
+                stmtNotaVenta.setInt(7, notaVenta.getId());
+                stmtNotaVenta.executeUpdate();
+
+                for (DetalleNotaVentaM detalle : detalles) {
+                    detalle.setIdNotaVenta(notaVenta.getId());
+                    if (detalle.existeDetalleNotaVenta(detalle.getId())) {
+                        detalle.actualizarDetalleNotaVenta();
+                    } else {
+                        detalle.crearDetalleNotaVenta();
+                    }
+                    actualizarInventario(detalle);
                 }
-                actualizarInventario(detalle);
+
+                conn.commit(); // Commit transaction
+                return "Nota de venta actualizada con éxito";
+            } catch (SQLException e) {
+                conn.rollback(); // Rollback transaction on error
+                throw new SQLException("Error al actualizar la nota de venta: " + e.getMessage(), e);
+            } finally {
+                conn.setAutoCommit(true); // Reset auto-commit mode
             }
+        } catch (SQLException e) {
+            throw new SQLException("Error al manejar la transacción: " + e.getMessage(), e);
         }
     }
 

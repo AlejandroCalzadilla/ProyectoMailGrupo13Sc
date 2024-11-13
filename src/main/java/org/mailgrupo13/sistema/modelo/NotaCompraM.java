@@ -124,7 +124,7 @@ public class NotaCompraM {
 
 
     // Create NotaCompra with details
-    public void crearNotaCompra(NotaCompraM notaCompra, List<DetalleNotaCompraM> detalles) throws SQLException {
+    public String crearNotaCompra(NotaCompraM notaCompra, List<DetalleNotaCompraM> detalles) throws SQLException {
         String sqlNota = "INSERT INTO purchase_note (purchase_date, total_amount, supplier_id, warehouse_id, user_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlDetalle = "INSERT INTO purchase_note_details (quantity, purchase_price, percentage, subtotal, purchase_note_id, medicament_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlUpdateInventory = "UPDATE inventory SET stock = stock + ?, price = ? WHERE medicament_id = ?";
@@ -174,6 +174,7 @@ public class NotaCompraM {
             }
 
             conn.commit();
+            return "Nota de compra creada";
         } catch (SQLException e) {
             conn.rollback();
             throw e;

@@ -58,7 +58,6 @@ public class ClientesService {
 
     public String actualizarCliente(int id, String nombre, String apellido,String telefono,String genero, String fechanaciemiento) throws SQLException {
             ClienteValidator.validarCampos(nombre, apellido, telefono, genero, fechanaciemiento,0);
-
             ClienteM clienteMObj=cargar(id,nombre,apellido,telefono,genero,fechanaciemiento,0);
             return clienteMObj.actualizarCliente();
 

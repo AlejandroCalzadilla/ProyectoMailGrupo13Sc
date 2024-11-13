@@ -248,6 +248,7 @@ public class Main {
             System.out.println(notaVentaN.crearNotaVenta( "2023-10-01",2,2,2,detalleNotaVentaNS));
             System.out.println(notaVentaN.obtenerNotaVentas());
 
+            //System.out.println(notaVentaN.actualizarNotaVenta(2,"2022-11-01",2,3,2,detalleNotaVentaNS));
 
 
 

@@ -21,6 +21,7 @@ public class TratamientosN {
     }
     public TratamientosN( String medicamento, String notas ) throws SQLException {
 
+         validarCamposTratamientos(medicamento, notas, 1);
          this.medicamento = medicamento;
          this.notas = notas;
         // this.consultaId = consultaid;
@@ -146,8 +147,8 @@ public class TratamientosN {
     }
 
     private void validarCamposTratamientos(String medicamento, String notas, int consultaId) {
-        if (medicamento == null || medicamento.isEmpty()) {
-            throw new IllegalArgumentException("El medicamento no puede estar vacío");
+        if (medicamento == null || medicamento.isEmpty() || medicamento.length()<1 || medicamento.length()>=255) {
+            throw new IllegalArgumentException("El medicamento no puede estar vacío y debe tener mimino 1 caracteres y menos de 255, si no hay notas escriba un punto ");
         }
         if (notas == null || notas.isEmpty()) {
             throw new IllegalArgumentException("Las notas no pueden estar vacías");
@@ -156,4 +157,7 @@ public class TratamientosN {
             throw new IllegalArgumentException("El ID de la consulta debe ser mayor que 0");
         }
     }
+
+
+
 }

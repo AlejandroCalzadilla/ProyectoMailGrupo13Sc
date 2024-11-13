@@ -47,24 +47,24 @@ public class NotaVentaService {
 
 
 
-    public void crearNotaVenta(String fechaVenta, int warehouseId, int userId, int customerId, List<DetalleNotaVentaN> detalles) throws SQLException {
+    public String crearNotaVenta(String fechaVenta, int warehouseId, int userId, int customerId, List<DetalleNotaVentaN> detalles) throws SQLException {
         float totalMonto = 0;
         for (DetalleNotaVentaN detalle : detalles) {
             totalMonto += detalle.getSubtotal();
         }
-        notaVentaM.crearNotaVenta(cargar(0, Date.valueOf(fechaVenta), totalMonto, warehouseId, userId, customerId), cargardetalle(detalles));
+        return notaVentaM.crearNotaVenta(cargar(0, Date.valueOf(fechaVenta), totalMonto, warehouseId, userId, customerId), cargardetalle(detalles));
     }
 
     public NotaVentaN leerNotaVenta(int id) throws SQLException {
         return mapear(notaVentaM.leerNotaVenta(id));
     }
 
-    public void actualizarNotaVenta(int id, String fechaVenta, int warehouseId, int userId, int customerId, List<DetalleNotaVentaN> detalles) throws SQLException {
+    public String actualizarNotaVenta(int id, String fechaVenta, int warehouseId, int userId, int customerId, List<DetalleNotaVentaN> detalles) throws SQLException {
         float totalMonto = 0;
         for (DetalleNotaVentaN detalle : detalles) {
             totalMonto += detalle.getSubtotal();
         }
-        notaVentaM.actualizarNotaVenta(cargar(id, Date.valueOf(fechaVenta), totalMonto, warehouseId, userId, customerId), cargardetalle(detalles));
+       return notaVentaM.actualizarNotaVenta(cargar(id, Date.valueOf(fechaVenta), totalMonto, warehouseId, userId, customerId), cargardetalle(detalles));
     }
 
     public void eliminarNotaVenta(int id) throws SQLException {
