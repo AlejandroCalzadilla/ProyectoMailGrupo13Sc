@@ -100,34 +100,14 @@ public class DetalleNotaCompraM {
         this.actualizadoEn = actualizadoEn;
     }
 
-    // Métodos CRUD
 
-    // Crear un detalle de nota de compra
-    public boolean crearDetalleNotaCompra() {
-        if (!existeNotaCompra(notaCompraId)) {
-            throw new IllegalArgumentException("No existe una nota de compra con el ID proporcionado: " + notaCompraId);
-        }
-        if (!existeMedicamento(medicamentoId)) {
-            throw new IllegalArgumentException("No existe un medicamento con el ID proporcionado: " + medicamentoId);
-        }
 
-        String sql = "INSERT INTO purchase_note_details (quantity, purchase_price, percentage, subtotal, purchase_note_id, medicament_id, created_at, updated_at) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, cantidad);
-            stmt.setFloat(2, precioCompra);
-            stmt.setFloat(3, porcentaje);
-            stmt.setFloat(4, subtotal);
-            stmt.setInt(5, notaCompraId);
-            stmt.setInt(6, medicamentoId);
-            stmt.setTimestamp(7, creadoEn);
-            stmt.setTimestamp(8, actualizadoEn);
-            stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            throw new IllegalArgumentException("Error al crear el detalle de la nota de compra: " + e.getMessage(), e);
-        }
-    }
+
+
+
+
+
+
 
     // Leer un detalle de nota de compra por ID
     public DetalleNotaCompraM leerDetalleNotaCompra(int id) {
@@ -155,50 +135,17 @@ public class DetalleNotaCompraM {
         }
     }
 
-    // Actualizar un detalle de nota de compra
-    public boolean actualizarDetalleNotaCompra() {
-        if (!existeDetalleNotaCompra(id)) {
-            throw new IllegalArgumentException("No existe un detalle de nota de compra con el ID proporcionado: " + id);
-        }
-        if (!existeNotaCompra(notaCompraId)) {
-            throw new IllegalArgumentException("No existe una nota de compra con el ID proporcionado: " + notaCompraId);
-        }
-        if (!existeMedicamento(medicamentoId)) {
-            throw new IllegalArgumentException("No existe un medicamento con el ID proporcionado: " + medicamentoId);
-        }
 
-        String sql = "UPDATE purchase_note_details SET quantity = ?, purchase_price = ?, percentage = ?, subtotal = ?, purchase_note_id = ?, medicament_id = ?, updated_at = ? WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, cantidad);
-            stmt.setFloat(2, precioCompra);
-            stmt.setFloat(3, porcentaje);
-            stmt.setFloat(4, subtotal);
-            stmt.setInt(5, notaCompraId);
-            stmt.setInt(6, medicamentoId);
-            stmt.setTimestamp(7, actualizadoEn);
-            stmt.setInt(8, id);
-            stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            throw new IllegalArgumentException("Error al actualizar el detalle de la nota de compra: " + e.getMessage(), e);
-        }
-    }
 
-    // Eliminar un detalle de nota de compra
-    public boolean eliminarDetalleNotaCompra(int id) {
-        if (!existeDetalleNotaCompra(id)) {
-            throw new IllegalArgumentException("No existe un detalle de nota de compra con el ID proporcionado: " + id);
-        }
 
-        String sql = "DELETE FROM purchase_note_details WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            throw new IllegalArgumentException("Error al eliminar el detalle de la nota de compra: " + e.getMessage(), e);
-        }
-    }
+
+
+
+
+
+
+
+
 
     // Obtener todos los detalles de las notas de compra por ID de la nota de compra
     public List<DetalleNotaCompraM> obtenerDetallesPorNotaCompra(int notaCompraId) {
@@ -270,4 +217,6 @@ public class DetalleNotaCompraM {
         }
         return false;
     }
+
+
 }

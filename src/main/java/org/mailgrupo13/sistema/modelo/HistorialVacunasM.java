@@ -201,6 +201,33 @@ public class HistorialVacunasM {
         return false;
     }
 
+
+    public List<HistorialVacunasM> obtenerHistorialesVacunasPorMascota(int petId) throws SQLException {
+        List<HistorialVacunasM> historialVacunasMList = new ArrayList<>();
+        String sql = "SELECT * FROM vaccinate_history WHERE pet_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, petId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                HistorialVacunasM historialVacunasM = new HistorialVacunasM();
+                historialVacunasM.setId(rs.getInt("id"));
+                historialVacunasM.setPetId(rs.getInt("pet_id"));
+                historialVacunasM.setVaccinationId(rs.getInt("vaccination_id"));
+                historialVacunasM.setCreadoEn(rs.getTimestamp("created_at"));
+                historialVacunasM.setActualizadoEn(rs.getTimestamp("updated_at"));
+                historialVacunasM.setSiguienteFechaVencimiento(rs.getDate("next_due_date"));
+                historialVacunasMList.add(historialVacunasM);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Error fetching vaccination history for pet ID: " + petId, e);
+        }
+        return historialVacunasMList;
+    }
+
+
+
+
     // Verificar si una mascota existe por ID
     private boolean existeMascota(int petId) {
         String sql = "SELECT COUNT(*) FROM pets WHERE id = ?";

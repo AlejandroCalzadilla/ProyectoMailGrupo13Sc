@@ -27,8 +27,13 @@ public class ProveedoresN {
     }
 
 
+    public ProveedoresN leerProveedor(int id ) throws SQLException {
 
-    public List<ProveedoresN> obtenerProveedores() throws SQLException {
+        return  proveedoresService.leerProveedor(id);
+    }
+
+
+    public String obtenerProveedores() throws SQLException {
         return proveedoresService.obtenerProveedores();
     }
 
@@ -121,7 +126,15 @@ public class ProveedoresN {
         this.actualizadoEn = actualizadoEn;
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return "ProveedoresN{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", pais='" + pais + '\'' +
+                ", telefono='" + telefono + '\'' +
+                ", email='" + email + '\'' +
+                ", direccion='" + direccion + '\'' +
+                '}';
+    }
 }

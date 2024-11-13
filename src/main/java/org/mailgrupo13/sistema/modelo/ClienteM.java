@@ -131,13 +131,13 @@ public class ClienteM {
   }
 
   // Actualizar un cliente
-  public boolean actualizarCliente() {
+  public String actualizarCliente() {
     if (!existeUsuario(idUsuario)) {
       throw new IllegalArgumentException("No existe un usuario con el ID proporcionado: " + idUsuario);
     }
 
     String checkSql = "SELECT COUNT(*) FROM customers WHERE id = ?";
-    String sql = "UPDATE customers SET first_name = ?, last_name = ?, phone_number = ?, gender = ?, birthdate = ?, user_id = ?, updated_at = ? WHERE id = ?";
+    String sql = "UPDATE customers SET first_name = ?, last_name = ?, phone_number = ?, gender = ?, birthdate = ?, updated_at = ? WHERE id = ?";
     try (PreparedStatement checkStmt = conn.prepareStatement(checkSql);
          PreparedStatement stmt = conn.prepareStatement(sql)) {
       checkStmt.setInt(1, id);
@@ -151,11 +151,10 @@ public class ClienteM {
       stmt.setString(3, telefono);
       stmt.setString(4, genero);
       stmt.setDate(5, fechaNacimiento);
-      stmt.setInt(6, idUsuario);
-      stmt.setTimestamp(7, actualizadoEn);
-      stmt.setInt(8, id);
+      stmt.setTimestamp(6, actualizadoEn);
+      stmt.setInt(7, id);
       stmt.executeUpdate();
-      return true;
+      return "Cliente actualizado";
     } catch (SQLException e) {
       throw new IllegalArgumentException("Error al actualizar el cliente: " + e.getMessage(), e);
     }

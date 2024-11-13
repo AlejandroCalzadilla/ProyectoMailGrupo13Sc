@@ -2,6 +2,7 @@ package org.mailgrupo13.sistema.negocio.mascotas;
 
 
 import org.mailgrupo13.sistema.modelo.MascotasM;
+import org.mailgrupo13.sistema.negocio.vacunas.HistorialVacunasN;
 
 import java.sql.Date;
 import java.sql.SQLException;
@@ -19,21 +20,24 @@ public class MascotasService {
 
 
 
-    public MascotasN leerMascota(int id) throws SQLException {
-          MascotasN mascota = new MascotasN();
-          this.mascotasM=this.mascotasM.leerMascota(id);
-          mascota.setNombre(this.mascotasM.getNombre());
-            mascota.setPeso(this.mascotasM.getPeso());
-            mascota.setColor(this.mascotasM.getColor());
-            mascota.setFechaNacimiento(Date.valueOf(this.mascotasM.getFechaNacimiento().toString()));
-            mascota.setUrlFoto(this.mascotasM.getUrlFoto());
-            mascota.setIdCliente(this.mascotasM.getIdCliente());
-            mascota.setIdRaza(this.mascotasM.getIdRaza());
-            mascota.setCreadoEn(Timestamp.valueOf(this.mascotasM.getCreadoEn().toString()));
-            mascota.setActualizadoEn(Timestamp.valueOf(this.mascotasM.getActualizadoEn().toString()));
+    public String leerMascota(int id) throws SQLException {
+        MascotasN mascota = new MascotasN();
+        this.mascotasM = this.mascotasM.leerMascota(id);
+        mascota.setNombre(this.mascotasM.getNombre());
+        mascota.setPeso(this.mascotasM.getPeso());
+        mascota.setColor(this.mascotasM.getColor());
+        mascota.setFechaNacimiento(Date.valueOf(this.mascotasM.getFechaNacimiento().toString()));
+        mascota.setUrlFoto(this.mascotasM.getUrlFoto());
+        mascota.setIdCliente(this.mascotasM.getIdCliente());
+        mascota.setIdRaza(this.mascotasM.getIdRaza());
+        mascota.setCreadoEn(Timestamp.valueOf(this.mascotasM.getCreadoEn().toString()));
+        mascota.setActualizadoEn(Timestamp.valueOf(this.mascotasM.getActualizadoEn().toString()));
 
-          return mascota;
+        // Fetch vaccination history
+        HistorialVacunasN historialVacunasN = new HistorialVacunasN();
+        String historialVacunasMList = historialVacunasN.buscarPorMascotaId(id);
 
+        return  mascota.toString()+ "\n" + "vacunas de la mascota"+"\n" +historialVacunasMList;
     }
 
 
@@ -80,6 +84,7 @@ public class MascotasService {
     public String mapeard(List<MascotasM> mascotasMList) throws SQLException {
         StringBuilder sb = new StringBuilder();
         String format = "%-5s %-10s %-10s %-10s %-15s %-30s %-10s %-10s %-30s %-30s%n";
+        sb.append("Mascotas LISTA------------------------------------:\n");
         sb.append(String.format(format, "ID", "Nombre", "Peso", "Color", "Fecha Nac.", "URL Foto", "ID Cliente", "ID Raza", "Creado En", "Actualizado En"));
         sb.append("------------------------------------------------------------------------------------------------------------------------------------------------\n");
         for (MascotasM mascotaM : mascotasMList) {

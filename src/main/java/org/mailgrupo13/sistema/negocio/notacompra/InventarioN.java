@@ -79,10 +79,15 @@ public class InventarioN {
     }
 
     // CRUD Methods
+    /*
     public List<InventarioN> obtenerInventarios() throws SQLException {
         return mapear(inventarioM.obtenerInventarios());
     }
 
+     */
+
+
+    /*
     public String agregarInventario(int stock, float precio, int medicamentoId, int bodegaId) throws SQLException {
         try {
             validarCampos(stock, precio, medicamentoId, bodegaId);
@@ -152,4 +157,6 @@ public class InventarioN {
             throw new IllegalArgumentException("El ID de la bodega debe ser mayor que 0");
         }
     }
+
+     */
 }

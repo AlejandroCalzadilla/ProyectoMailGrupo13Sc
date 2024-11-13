@@ -76,7 +76,25 @@ public class VacunasM {
     // Métodos CRUD
 
     // Crear una vacuna
-    public boolean crearVacuna() {
+    private boolean existeVacunaPorNombre(String nombre) {
+        String sql = "SELECT COUNT(*) FROM vaccinations WHERE vaccine = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nombre);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public String crearVacuna() {
+        if (existeVacunaPorNombre(vacuna)) {
+            throw new IllegalArgumentException("Ya existe una vacuna con el nombre: " + vacuna);
+        }
+
         String sql = "INSERT INTO vaccinations (vaccine, duration_days, notes, created_at, updated_at) " +
                 "VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -86,11 +104,14 @@ public class VacunasM {
             stmt.setTimestamp(4, creadoEn);
             stmt.setTimestamp(5, actualizadoEn);
             stmt.executeUpdate();
-            return true;
+            return "Vacuna creada";
         } catch (SQLException e) {
             throw new IllegalArgumentException("Error al crear la vacuna: " + e.getMessage(), e);
         }
     }
+
+
+
 
     // Leer una vacuna por ID
     public VacunasM leerVacuna(int id) {
@@ -116,9 +137,13 @@ public class VacunasM {
     }
 
     // Actualizar una vacuna
-    public boolean actualizarVacuna() {
+    public String actualizarVacuna() {
         if (!existeVacuna(id)) {
             throw new IllegalArgumentException("No existe una vacuna con el ID proporcionado: " + id);
+        }
+
+        if (existeVacunaPorNombre(vacuna)) {
+            throw new IllegalArgumentException("Ya existe una vacuna con el nombre: " + vacuna);
         }
 
         String sql = "UPDATE vaccinations SET vaccine = ?, duration_days = ?, notes = ?, updated_at = ? WHERE id = ?";
@@ -129,7 +154,7 @@ public class VacunasM {
             stmt.setTimestamp(4, actualizadoEn);
             stmt.setInt(5, id);
             stmt.executeUpdate();
-            return true;
+            return "Vacuna actualizada";
         } catch (SQLException e) {
             throw new IllegalArgumentException("Error al actualizar la vacuna: " + e.getMessage(), e);
         }
@@ -172,6 +197,15 @@ public class VacunasM {
         }
         return vacunas;
     }
+
+
+    // Method to get vaccination history by pet ID
+
+
+
+
+
+
 
     // Verificar si una vacuna existe por ID
     private boolean existeVacuna(int id) {

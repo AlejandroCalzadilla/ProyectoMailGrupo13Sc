@@ -84,30 +84,6 @@ public class InventarioM {
 
     // Métodos CRUD
 
-    // Crear un inventario
-    public boolean crearInventario() {
-        if (!existeMedicamento(medicamentoId)) {
-            throw new IllegalArgumentException("No existe un medicamento con el ID proporcionado: " + medicamentoId);
-        }
-        if (!existeBodega(bodegaId)) {
-            throw new IllegalArgumentException("No existe una bodega con el ID proporcionado: " + bodegaId);
-        }
-
-        String sql = "INSERT INTO inventory (stock, price, medicament_id, warehouse_id, created_at, updated_at) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, stock);
-            stmt.setFloat(2, precio);
-            stmt.setInt(3, medicamentoId);
-            stmt.setInt(4, bodegaId);
-            stmt.setTimestamp(5, creadoEn);
-            stmt.setTimestamp(6, actualizadoEn);
-            stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            throw new IllegalArgumentException("Error al crear el inventario: " + e.getMessage(), e);
-        }
-    }
 
     // Leer un inventario por ID
     public InventarioM leerInventario(int id) {
@@ -133,48 +109,9 @@ public class InventarioM {
         }
     }
 
-    // Actualizar un inventario
-    public boolean actualizarInventario() {
-        if (!existeInventario(id)) {
-            throw new IllegalArgumentException("No existe un inventario con el ID proporcionado: " + id);
-        }
-        if (!existeMedicamento(medicamentoId)) {
-            throw new IllegalArgumentException("No existe un medicamento con el ID proporcionado: " + medicamentoId);
-        }
-        if (!existeBodega(bodegaId)) {
-            throw new IllegalArgumentException("No existe una bodega con el ID proporcionado: " + bodegaId);
-        }
 
-        String sql = "UPDATE inventory SET stock = ?, price = ?, medicament_id = ?, warehouse_id = ?, updated_at = ? WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, stock);
-            stmt.setFloat(2, precio);
-            stmt.setInt(3, medicamentoId);
-            stmt.setInt(4, bodegaId);
-            stmt.setTimestamp(5, actualizadoEn);
-            stmt.setInt(6, id);
-            stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            throw new IllegalArgumentException("Error al actualizar el inventario: " + e.getMessage(), e);
-        }
-    }
 
-    // Eliminar un inventario
-    public boolean eliminarInventario(int id) {
-        if (!existeInventario(id)) {
-            throw new IllegalArgumentException("No existe un inventario con el ID proporcionado: " + id);
-        }
 
-        String sql = "DELETE FROM inventory WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            throw new IllegalArgumentException("Error al eliminar el inventario: " + e.getMessage(), e);
-        }
-    }
 
     // Obtener todos los inventarios
     public List<InventarioM> obtenerInventarios() {

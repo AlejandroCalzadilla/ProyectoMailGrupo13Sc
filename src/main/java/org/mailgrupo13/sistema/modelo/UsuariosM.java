@@ -173,6 +173,30 @@ public class UsuariosM {
         return usuarios;
     }
 
+
+
+    // UsuariosM.java
+    public int crearUsuarioYRetornarId() {
+        String sql = "INSERT INTO users (email, password, name) VALUES (?, ?, ?) RETURNING id";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            stmt.setString(2, password);
+            stmt.setString(3, nombre);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+            } else {
+                throw new SQLException("Failed to retrieve user ID after insertion.");
+            }
+        } catch (SQLException e) {
+            if (e.getMessage().contains("duplicate key value violates unique constraint")) {
+                throw new IllegalArgumentException("El email ya está registrado: " + email);
+            } else {
+                throw new IllegalArgumentException("Error al crear el usuario: " + e.getMessage(), e);
+            }
+        }
+    }
+
     // Verificar si un usuario existe por ID
     private boolean existeUsuario(int id) {
         String sql = "SELECT COUNT(*) FROM users WHERE id = ?";

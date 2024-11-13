@@ -20,6 +20,99 @@ public class VacunasN {
         vacunasM = new VacunasM();
     }
 
+
+
+    // CRUD Methods
+    public String obtenerVacunas() throws SQLException {
+        return mapear(vacunasM.obtenerVacunas());
+    }
+
+    public VacunasN leerVacuna(int id) throws SQLException {
+        VacunasM vacunasMObj = vacunasM.leerVacuna(id);
+        VacunasN vacunasNObj = new VacunasN();
+        vacunasNObj.setId(vacunasMObj.getId());
+        vacunasNObj.setVacuna(vacunasMObj.getVacuna());
+        vacunasNObj.setDuracionDias(vacunasMObj.getDuracionDias());
+        vacunasNObj.setNotas(vacunasMObj.getNotas());
+        vacunasNObj.setCreadoEn(vacunasMObj.getCreadoEn());
+        vacunasNObj.setActualizadoEn(vacunasMObj.getActualizadoEn());
+        return vacunasNObj;
+
+
+    }
+
+
+    public String agregarVacuna(String vacuna, int duracionDias, String notas) throws SQLException {
+            validarCampos(vacuna, duracionDias, notas);
+            VacunasM vacunasMObj = cargar(0, vacuna, duracionDias, notas);
+         return vacunasMObj.crearVacuna();
+
+    }
+
+    public String actualizarVacuna(int id, String vacuna, int duracionDias, String notas) throws SQLException {
+            validarCampos(vacuna, duracionDias, notas);
+            VacunasM vacunasMObj = cargar(id, vacuna, duracionDias, notas);
+            return vacunasMObj.actualizarVacuna();
+
+    }
+
+    public boolean eliminarVacuna(int id) throws SQLException {
+        return vacunasM.eliminarVacuna(id);
+    }
+
+    private String mapear(List<VacunasM> vacunasMList) throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        String format = "%-5s %-20s %-15s %-30s %-30s %-30s%n";
+        sb.append(String.format(format, "ID", "Vacuna", "Duración (días)", "Notas", "Creado En", "Actualizado En"));
+        sb.append("------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        for (VacunasM vacunasM : vacunasMList) {
+            sb.append(String.format(format,
+                    vacunasM.getId(),
+                    vacunasM.getVacuna(),
+                    vacunasM.getDuracionDias(),
+                    vacunasM.getNotas(),
+                    vacunasM.getCreadoEn(),
+                    vacunasM.getActualizadoEn()));
+        }
+        return sb.toString();
+    }
+
+    private VacunasM cargar(int id, String vacuna, int duracionDias, String notas) throws SQLException {
+        VacunasM vacunasMObj = new VacunasM();
+        vacunasMObj.setId(id);
+        vacunasMObj.setVacuna(vacuna);
+        vacunasMObj.setDuracionDias(duracionDias);
+        vacunasMObj.setNotas(notas);
+        vacunasMObj.setCreadoEn(Timestamp.valueOf(java.time.LocalDateTime.now()));
+        vacunasMObj.setActualizadoEn(Timestamp.valueOf(java.time.LocalDateTime.now()));
+        return vacunasMObj;
+    }
+
+    private void validarCampos(String vacuna, int duracionDias, String notas) {
+        if (vacuna == null || vacuna.isEmpty()) {
+            throw new IllegalArgumentException("La vacuna no puede estar vacía");
+        }
+        if (duracionDias <= 0) {
+            throw new IllegalArgumentException("La duración en días debe ser mayor que 0");
+        }
+        if (notas == null || notas.isEmpty()) {
+            throw new IllegalArgumentException("Las notas no pueden estar vacías");
+        }
+    }
+
+
+    @Override
+    public String toString() {
+        return "VacunasN{" +
+                "id=" + id +
+                ", vacuna='" + vacuna + '\'' +
+                ", duracionDias=" + duracionDias +
+                ", notas='" + notas + '\'' +
+                ", creadoEn=" + creadoEn +
+                ", actualizadoEn=" + actualizadoEn +
+                '}';
+    }
+
     // Getters and Setters
     public int getId() {
         return id;
@@ -67,75 +160,5 @@ public class VacunasN {
 
     public void setActualizadoEn(Timestamp actualizadoEn) {
         this.actualizadoEn = actualizadoEn;
-    }
-
-    // CRUD Methods
-    public List<VacunasN> obtenerVacunas() throws SQLException {
-        return mapear(vacunasM.obtenerVacunas());
-    }
-
-    public String agregarVacuna(String vacuna, int duracionDias, String notas) throws SQLException {
-        try {
-            validarCampos(vacuna, duracionDias, notas);
-            VacunasM vacunasMObj = cargar(0, vacuna, duracionDias, notas);
-            vacunasMObj.crearVacuna();
-            return "Vacuna agregada con éxito";
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return "Error al agregar la vacuna: " + e.getMessage();
-        }
-    }
-
-    public boolean actualizarVacuna(int id, String vacuna, int duracionDias, String notas) throws SQLException {
-        try {
-            validarCampos(vacuna, duracionDias, notas);
-            VacunasM vacunasMObj = cargar(id, vacuna, duracionDias, notas);
-            return vacunasMObj.actualizarVacuna();
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-    }
-
-    public boolean eliminarVacuna(int id) throws SQLException {
-        return vacunasM.eliminarVacuna(id);
-    }
-
-    private List<VacunasN> mapear(List<VacunasM> vacunasMList) throws SQLException {
-        List<VacunasN> vacunasNList = new ArrayList<>();
-        for (VacunasM vacunasM : vacunasMList) {
-            VacunasN vacunasN = new VacunasN();
-            vacunasN.setId(vacunasM.getId());
-            vacunasN.setVacuna(vacunasM.getVacuna());
-            vacunasN.setDuracionDias(vacunasM.getDuracionDias());
-            vacunasN.setNotas(vacunasM.getNotas());
-            vacunasN.setCreadoEn(vacunasM.getCreadoEn());
-            vacunasN.setActualizadoEn(vacunasM.getActualizadoEn());
-            vacunasNList.add(vacunasN);
-        }
-        return vacunasNList;
-    }
-
-    private VacunasM cargar(int id, String vacuna, int duracionDias, String notas) throws SQLException {
-        VacunasM vacunasMObj = new VacunasM();
-        vacunasMObj.setId(id);
-        vacunasMObj.setVacuna(vacuna);
-        vacunasMObj.setDuracionDias(duracionDias);
-        vacunasMObj.setNotas(notas);
-        vacunasMObj.setCreadoEn(Timestamp.valueOf(java.time.LocalDateTime.now()));
-        vacunasMObj.setActualizadoEn(Timestamp.valueOf(java.time.LocalDateTime.now()));
-        return vacunasMObj;
-    }
-
-    private void validarCampos(String vacuna, int duracionDias, String notas) {
-        if (vacuna == null || vacuna.isEmpty()) {
-            throw new IllegalArgumentException("La vacuna no puede estar vacía");
-        }
-        if (duracionDias <= 0) {
-            throw new IllegalArgumentException("La duración en días debe ser mayor que 0");
-        }
-        if (notas == null || notas.isEmpty()) {
-            throw new IllegalArgumentException("Las notas no pueden estar vacías");
-        }
     }
 }

@@ -94,8 +94,8 @@ public class ProveedoresM {
 
     // Crear un proveedor
     public String crearProveedor() {
-        if (existeProveedor(nombre)) {
-            throw new IllegalArgumentException("Ya existe un proveedor con el mismo nombre: " + nombre);
+        if (existeProveedor(nombre,telefono,email) ) {
+            throw new IllegalArgumentException("Ya existe un proveedor con el mismo nombre: " + nombre +"telefono: "+telefono+"o email: "+email);
         }
         String sql = "INSERT INTO suppliers (name, country, phone_number, email, address, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -140,8 +140,8 @@ public class ProveedoresM {
 
     // Actualizar un proveedor
     public String actualizarProveedor() {
-        if (existeProveedor(nombre)) {
-            throw new IllegalArgumentException("Ya existe un proveedor con el mismo nombre: " + nombre);
+        if (existeProveedor(nombre,telefono,email) ) {
+            throw new IllegalArgumentException("Ya existe un proveedor con el mismo nombre: " + nombre +"  telefono: "+telefono+"  o email: "+email);
         }
 
         String checkSql = "SELECT COUNT(*) FROM suppliers WHERE id = ?";
@@ -212,11 +212,12 @@ public class ProveedoresM {
         return proveedores;
     }
 
-    // Verificar si un proveedor existe por nombre
-    private boolean existeProveedor(String nombre) {
-        String sql = "SELECT COUNT(*) FROM suppliers WHERE name = ?";
+    private boolean existeProveedor(String nombre, String telefono, String email) {
+        String sql = "SELECT COUNT(*) FROM suppliers WHERE name = ? OR phone_number = ? OR email = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nombre);
+            stmt.setString(2, telefono);
+            stmt.setString(3, email);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1) > 0;

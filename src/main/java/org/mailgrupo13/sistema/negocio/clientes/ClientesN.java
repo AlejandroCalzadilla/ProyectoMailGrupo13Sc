@@ -113,12 +113,12 @@ public class ClientesN {
     }
 
 
-    public String agregarCliente(String nombre, String apellido,String telefono,String genero, String fechanaciemiento,int idUsuario) throws SQLException {
-       return clientesService.agregarCliente(nombre, apellido, telefono, genero, fechanaciemiento, idUsuario);
+    public String agregarCliente(String nombre, String apellido,String telefono,String genero, String fechanaciemiento,String email,String password) throws SQLException {
+       return clientesService.agregarCliente(nombre, apellido, telefono, genero, fechanaciemiento, email,password);
     }
 
-    public boolean actualizarCliente(int id, String nombre, String apellido,String telefono,String genero, String fechanaciemiento,int idUsuario) throws SQLException {
-      return  clientesService.actualizarCliente(id, nombre, apellido, telefono, genero, fechanaciemiento, idUsuario);
+    public String actualizarCliente(int id, String nombre, String apellido,String telefono,String genero, String fechanaciemiento) throws SQLException {
+      return  clientesService.actualizarCliente(id, nombre, apellido, telefono, genero, fechanaciemiento);
     }
 
     // Método para eliminar un cliente por ID

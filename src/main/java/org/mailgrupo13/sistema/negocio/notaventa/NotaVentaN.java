@@ -1,5 +1,6 @@
 package org.mailgrupo13.sistema.negocio.notaventa;
 
+import org.mailgrupo13.sistema.modelo.DetalleNotaVentaM;
 import org.mailgrupo13.sistema.modelo.NotaVentaM;
 
 import java.sql.SQLException;
@@ -12,15 +13,20 @@ public class NotaVentaN {
     private int id;
     private Date fechaVenta;
     private float totalMonto;
+    private int warehouseId;
+    private int userId;
+    private int customerId;
     private Timestamp creadoEn;
     private Timestamp actualizadoEn;
-    private NotaVentaM notaVentaM;
+    private NotaVentaService notaVentaService;
 
     public NotaVentaN() throws SQLException {
-        notaVentaM = new NotaVentaM();
+        notaVentaService = new NotaVentaService();
     }
 
     // Getters and Setters
+    // ...
+
     public int getId() {
         return id;
     }
@@ -45,6 +51,30 @@ public class NotaVentaN {
         this.totalMonto = totalMonto;
     }
 
+    public int getWarehouseId() {
+        return warehouseId;
+    }
+
+    public void setWarehouseId(int warehouseId) {
+        this.warehouseId = warehouseId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
     public Timestamp getCreadoEn() {
         return creadoEn;
     }
@@ -61,68 +91,45 @@ public class NotaVentaN {
         this.actualizadoEn = actualizadoEn;
     }
 
-    // CRUD Methods
-    public List<NotaVentaN> obtenerNotasVenta() throws SQLException {
-        return mapear(notaVentaM.obtenerNotasVenta());
+
+     public String obtenerNotaVentas() throws SQLException {
+         return notaVentaService.obtenerNotaVentas();
+     }
+
+    // Create NotaVenta
+    public String crearNotaVenta(String fechaVenta, int warehouseId, int userId, int customerId, List<DetalleNotaVentaN> detalles) throws SQLException {
+        notaVentaService.crearNotaVenta(fechaVenta, warehouseId, userId, customerId, detalles);
+        return "Nota de venta creada con éxito";
     }
 
-    public String agregarNotaVenta(Date fechaVenta, float totalMonto) throws SQLException {
-        try {
-            validarCampos(fechaVenta, totalMonto);
-            NotaVentaM notaVentaMObj = cargar(0, fechaVenta, totalMonto);
-            notaVentaMObj.crearNotaVenta();
-            return "Nota de venta agregada con éxito";
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return "Error al agregar la nota de venta: " + e.getMessage();
-        }
+    // Read NotaVenta by ID
+    public NotaVentaN leerNotaVenta(int id) throws SQLException {
+        return notaVentaService.leerNotaVenta(id);
     }
 
-    public boolean actualizarNotaVenta(int id, Date fechaVenta, float totalMonto) throws SQLException {
-        try {
-            validarCampos(fechaVenta, totalMonto);
-            NotaVentaM notaVentaMObj = cargar(id, fechaVenta, totalMonto);
-            return notaVentaMObj.actualizarNotaVenta();
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
+    // Update NotaVenta
+    public String actualizarNotaVenta(int id, String fechaVenta, int warehouseId, int userId, int customerId, List<DetalleNotaVentaN> detalles) throws SQLException {
+        notaVentaService.actualizarNotaVenta(id, fechaVenta, warehouseId, userId, customerId, detalles);
+        return "Nota de venta actualizada con éxito";
     }
 
-    public boolean eliminarNotaVenta(int id) throws SQLException {
-        return notaVentaM.eliminarNotaVenta(id);
+    // Delete NotaVenta by ID
+    public String eliminarNotaVenta(int id) throws SQLException {
+        notaVentaService.eliminarNotaVenta(id);
+        return "Nota de venta eliminada con éxito";
     }
 
-    private List<NotaVentaN> mapear(List<NotaVentaM> notaVentaMList) throws SQLException {
-        List<NotaVentaN> notaVentaNList = new ArrayList<>();
-        for (NotaVentaM notaVentaM : notaVentaMList) {
-            NotaVentaN notaVentaN = new NotaVentaN();
-            notaVentaN.setId(notaVentaM.getId());
-            notaVentaN.setFechaVenta(notaVentaM.getFechaVenta());
-            notaVentaN.setTotalMonto(notaVentaM.getTotalMonto());
-            notaVentaN.setCreadoEn(notaVentaM.getCreadoEn());
-            notaVentaN.setActualizadoEn(notaVentaM.getActualizadoEn());
-            notaVentaNList.add(notaVentaN);
-        }
-        return notaVentaNList;
-    }
-
-    private NotaVentaM cargar(int id, Date fechaVenta, float totalMonto) throws SQLException {
-        NotaVentaM notaVentaMObj = new NotaVentaM();
-        notaVentaMObj.setId(id);
-        notaVentaMObj.setFechaVenta(fechaVenta);
-        notaVentaMObj.setTotalMonto(totalMonto);
-        notaVentaMObj.setCreadoEn(Timestamp.valueOf(java.time.LocalDateTime.now()));
-        notaVentaMObj.setActualizadoEn(Timestamp.valueOf(java.time.LocalDateTime.now()));
-        return notaVentaMObj;
-    }
-
-    private void validarCampos(Date fechaVenta, float totalMonto) {
-        if (fechaVenta == null) {
-            throw new IllegalArgumentException("La fecha de venta no puede estar vacía");
-        }
-        if (totalMonto <= 0) {
-            throw new IllegalArgumentException("El monto total debe ser mayor que 0");
-        }
+    @Override
+    public String toString() {
+        return "NotaVentaN{" +
+                "id=" + id +
+                ", fechaVenta=" + fechaVenta +
+                ", totalMonto=" + totalMonto +
+                ", warehouseId=" + warehouseId +
+                ", userId=" + userId +
+                ", customerId=" + customerId +
+                ", creadoEn=" + creadoEn +
+                ", actualizadoEn=" + actualizadoEn +
+                '}';
     }
 }

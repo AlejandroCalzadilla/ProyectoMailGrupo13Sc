@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProveedoresService {
-  private final ProveedoresM proveedoresM;
+  private ProveedoresM proveedoresM;
 
 
      ProveedoresService(ProveedoresM proveedoresM) {
@@ -17,7 +17,22 @@ public class ProveedoresService {
 
 
 
-    public List<ProveedoresN> obtenerProveedores() throws SQLException {
+    public ProveedoresN leerProveedor(int id ) throws SQLException {
+
+        ProveedoresN proveedor = new ProveedoresN();
+        this.proveedoresM=this.proveedoresM.leerProveedor(id);
+        proveedor.setNombre(this.proveedoresM.getNombre());
+        proveedor.setPais(this.proveedoresM.getPais());
+        proveedor.setTelefono(this.proveedoresM.getTelefono());
+        proveedor.setEmail(this.proveedoresM.getEmail());
+        proveedor.setDireccion(this.proveedoresM.getDireccion());
+        proveedor.setCreadoEn(Timestamp.valueOf(this.proveedoresM.getCreadoEn().toString()));
+        proveedor.setActualizadoEn(Timestamp.valueOf(this.proveedoresM.getActualizadoEn().toString()));
+        return proveedor;
+    }
+
+
+    public String obtenerProveedores() throws SQLException {
         return mapear(proveedoresM.obtenerProveedores());
     }
 
@@ -50,21 +65,23 @@ public class ProveedoresService {
 
 
 
-    private List<ProveedoresN> mapear(List<ProveedoresM> proveedoresMList) throws SQLException {
-        List<ProveedoresN> proveedoresNList = new ArrayList<>();
+    private String mapear(List<ProveedoresM> proveedoresMList) throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        String format = "%-5s %-20s %-15s %-15s %-30s %-30s %-30s %-30s%n";
+        sb.append(String.format(format, "ID", "Nombre", "Pais", "Telefono", "Email", "Direccion", "Creado En", "Actualizado En"));
+        sb.append("------------------------------------------------------------------------------------------------------------------------------------------------\n");
         for (ProveedoresM proveedoresM : proveedoresMList) {
-            ProveedoresN proveedoresN = new ProveedoresN();
-            proveedoresN.setId(proveedoresM.getId());
-            proveedoresN.setNombre(proveedoresM.getNombre());
-            proveedoresN.setPais(proveedoresM.getPais());
-            proveedoresN.setTelefono(proveedoresM.getTelefono());
-            proveedoresN.setEmail(proveedoresM.getEmail());
-            proveedoresN.setDireccion(proveedoresM.getDireccion());
-            proveedoresN.setCreadoEn(proveedoresM.getCreadoEn());
-            proveedoresN.setActualizadoEn(proveedoresM.getActualizadoEn());
-            proveedoresNList.add(proveedoresN);
+            sb.append(String.format(format,
+                    proveedoresM.getId(),
+                    proveedoresM.getNombre(),
+                    proveedoresM.getPais(),
+                    proveedoresM.getTelefono(),
+                    proveedoresM.getEmail(),
+                    proveedoresM.getDireccion(),
+                    proveedoresM.getCreadoEn(),
+                    proveedoresM.getActualizadoEn()));
         }
-        return proveedoresNList;
+        return sb.toString();
     }
 
     private ProveedoresM cargar(int id, String nombre, String pais, String telefono, String email, String direccion) throws SQLException {

@@ -1,6 +1,7 @@
 package org.mailgrupo13.sistema.negocio.clientes;
 
 import org.mailgrupo13.sistema.modelo.ClienteM;
+import org.mailgrupo13.sistema.modelo.UsuariosM;
 
 import java.sql.Date;
 import java.sql.SQLException;
@@ -39,25 +40,43 @@ public class ClientesService {
     }
 
 
-    public String agregarCliente(String nombre, String apellido,String telefono,String genero, String fechanaciemiento,int idUsuario) throws SQLException {
-             ClienteValidator.validarCampos(nombre, apellido, telefono, genero, fechanaciemiento, idUsuario);
-            ClienteM clienteMObj = cargar(0, nombre, apellido, telefono, genero, fechanaciemiento, idUsuario);
-            return  clienteMObj.crearCliente();
+    // ClientesService.java
+    public String agregarCliente(String nombre, String apellido, String telefono, String genero, String fechanaciemiento, String email, String password) throws SQLException {
+        ClienteValidator.validarCampos(nombre, apellido, telefono, genero, fechanaciemiento, 0); // Assuming 0 for idUsuario as it will be set later
 
+        // Create user and get user ID
+        UsuariosM usuariosMObj = new UsuariosM();
+        usuariosMObj.setEmail(email);
+        usuariosMObj.setPassword(password);
+        usuariosMObj.setNombre(nombre);
+        int userId = usuariosMObj.crearUsuarioYRetornarId();
+
+        // Create client with the obtained user ID
+        ClienteM clienteMObj = cargar(0, nombre, apellido, telefono, genero, fechanaciemiento, userId);
+        return clienteMObj.crearCliente();
     }
 
-    public boolean actualizarCliente(int id, String nombre, String apellido,String telefono,String genero, String fechanaciemiento,int idUsuario) throws SQLException {
-            ClienteValidator.validarCampos(nombre, apellido, telefono, genero, fechanaciemiento, idUsuario);
+    public String actualizarCliente(int id, String nombre, String apellido,String telefono,String genero, String fechanaciemiento) throws SQLException {
+            ClienteValidator.validarCampos(nombre, apellido, telefono, genero, fechanaciemiento,0);
 
-            ClienteM clienteMObj=cargar(id,nombre,apellido,telefono,genero,fechanaciemiento,idUsuario);
+            ClienteM clienteMObj=cargar(id,nombre,apellido,telefono,genero,fechanaciemiento,0);
             return clienteMObj.actualizarCliente();
 
     }
 
     // Método para eliminar un cliente por ID
-    public boolean eliminarCliente(int id) throws SQLException {
-        return clienteM.eliminarCliente(id);
+    public String eliminarCliente(int id) throws SQLException {
+        ClienteM cliente = clienteM.leerCliente(id);
+        boolean clienteEliminado = clienteM.eliminarCliente(id);
+        if (clienteEliminado) {
+            UsuariosM usuariosM = new UsuariosM();
+            usuariosM.eliminarUsuario(cliente.getIdUsuario());
+        }
+        return "cliente y usuario eliminado";
     }
+
+
+
 
 
     public String mapear(List<ClienteM> clientesM) throws SQLException {

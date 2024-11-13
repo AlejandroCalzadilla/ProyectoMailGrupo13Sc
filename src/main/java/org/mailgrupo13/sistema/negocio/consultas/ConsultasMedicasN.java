@@ -2,6 +2,7 @@ package org.mailgrupo13.sistema.negocio.consultas;
 
 import org.mailgrupo13.sistema.modelo.ConsultasMedicasM;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -14,12 +15,22 @@ public class ConsultasMedicasN {
     private String diagnostico;
     private Float tarifaConsulta;
     private int petId;
+    private  int user_id;
     private Timestamp creadoEn;
     private Timestamp actualizadoEn;
     private ConsultasMedicasM consultasMedicasM;
-
+    private  ConsultasServices consultasServices;
     public ConsultasMedicasN() throws SQLException {
         consultasMedicasM = new ConsultasMedicasM();
+        consultasServices = new ConsultasServices();
+    }
+
+    public int getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
     }
 
     // Getters and Setters
@@ -87,102 +98,36 @@ public class ConsultasMedicasN {
         this.actualizadoEn = actualizadoEn;
     }
 
+
+
+
+
+
+
+    public String leerConsulta(int id ) throws SQLException {
+        return  consultasServices.leerConsulta(id);
+    }
     // CRUD Methods
-    public List<ConsultasMedicasN> obtenerConsultasMedicas() throws SQLException {
-        return mapear(consultasMedicasM.obtenerConsultasMedicas());
+    public String obtenerConsultasMedicas() throws SQLException {
+        return consultasServices.obtenerConsultasMedicas();
     }
 
 
-
-
-
-
-
-
-
-
-   /*
-    public String agregarConsultaMedica(java.sql.Date fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId) throws SQLException {
-        try {
-            validarCampos(fecha, motivo, diagnostico, tarifaConsulta, petId);
-            ConsultasMedicasM consultasMedicasMObj = cargar(0, fecha, motivo, diagnostico, tarifaConsulta, petId);
-            consultasMedicasMObj.crearConsultaMedica();
-            return "Consulta médica agregada con éxito";
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return "Error al agregar la consulta médica: " + e.getMessage();
-        }
-    }
-
-    */
-
-
-    /*
-    public boolean actualizarConsultaMedica(int id, java.sql.Date fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId) throws SQLException {
-        try {
-            validarCampos(fecha, motivo, diagnostico, tarifaConsulta, petId);
-            ConsultasMedicasM consultasMedicasMObj = cargar(id, fecha, motivo, diagnostico, tarifaConsulta, petId);
-            return consultasMedicasMObj.actualizarConsultaMedica();
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
+    public String agregarConsultaMedica(String fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId,int user_id,List<TratamientosN> tratamientosNS) throws SQLException {
+        return  consultasServices.agregarConsultaMedicaConTratamientos(fecha, motivo, diagnostico, tarifaConsulta, petId,user_id ,tratamientosNS);
     }
 
 
-     */
-
+    public String actualizarConsultaMedica(int id, String fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId,int user_id, List<TratamientosN> tratamientosNS) throws SQLException {
+       return consultasServices.actualizarConsultaMedicaConTratamientos(id, fecha, motivo, diagnostico, tarifaConsulta, petId,user_id ,tratamientosNS);
+    }
 
 
     public boolean eliminarConsultaMedica(int id) throws SQLException {
         return consultasMedicasM.eliminarConsultaConTratamientos(id);
     }
 
-    private List<ConsultasMedicasN> mapear(List<ConsultasMedicasM> consultasMedicasMList) throws SQLException {
-        List<ConsultasMedicasN> consultasMedicasNList = new ArrayList<>();
-        for (ConsultasMedicasM consultasMedicasM : consultasMedicasMList) {
-            ConsultasMedicasN consultasMedicasN = new ConsultasMedicasN();
-            consultasMedicasN.setId(consultasMedicasM.getId());
-            consultasMedicasN.setFecha(consultasMedicasM.getFecha());
-            consultasMedicasN.setMotivo(consultasMedicasM.getMotivo());
-            consultasMedicasN.setDiagnostico(consultasMedicasM.getDiagnostico());
-            consultasMedicasN.setTarifaConsulta(consultasMedicasM.getTarifaConsulta());
-            consultasMedicasN.setPetId(consultasMedicasM.getPetId());
-            consultasMedicasN.setCreadoEn(consultasMedicasM.getCreadoEn());
-            consultasMedicasN.setActualizadoEn(consultasMedicasM.getActualizadoEn());
-            consultasMedicasNList.add(consultasMedicasN);
-        }
-        return consultasMedicasNList;
-    }
 
-    private ConsultasMedicasM cargar(int id, java.sql.Date fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId) throws SQLException {
-        ConsultasMedicasM consultasMedicasMObj = new ConsultasMedicasM();
-        consultasMedicasMObj.setId(id);
-        consultasMedicasMObj.setFecha(fecha);
-        consultasMedicasMObj.setMotivo(motivo);
-        consultasMedicasMObj.setDiagnostico(diagnostico);
-        consultasMedicasMObj.setTarifaConsulta(tarifaConsulta);
-        consultasMedicasMObj.setPetId(petId);
-        consultasMedicasMObj.setCreadoEn(Timestamp.valueOf(java.time.LocalDateTime.now()));
-        consultasMedicasMObj.setActualizadoEn(Timestamp.valueOf(java.time.LocalDateTime.now()));
-        return consultasMedicasMObj;
-    }
 
-    private void validarCampos(java.sql.Date fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId) {
-        if (fecha == null) {
-            throw new IllegalArgumentException("La fecha no puede estar vacía");
-        }
-        if (motivo == null || motivo.isEmpty()) {
-            throw new IllegalArgumentException("El motivo no puede estar vacío");
-        }
-        if (diagnostico == null || diagnostico.isEmpty()) {
-            throw new IllegalArgumentException("El diagnóstico no puede estar vacío");
-        }
-        if (tarifaConsulta == null || tarifaConsulta <= 0) {
-            throw new IllegalArgumentException("La tarifa de consulta debe ser mayor que 0");
-        }
-        if (petId <= 0) {
-            throw new IllegalArgumentException("El ID de la mascota debe ser mayor que 0");
-        }
-    }
+
 }

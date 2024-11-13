@@ -93,6 +93,15 @@ public class DetalleNotaVentaM {
 
     // Métodos CRUD
 
+
+
+
+
+
+
+
+
+
     // Crear un detalle de la nota de venta
     public boolean crearDetalleNotaVenta() {
         if (!existeNotaVenta(idNotaVenta)) {
@@ -212,7 +221,7 @@ public class DetalleNotaVentaM {
     }
 
     // Verificar si un detalle de nota de venta existe por ID
-    private boolean existeDetalleNotaVenta(int id) {
+    public boolean existeDetalleNotaVenta(int id) {
         String sql = "SELECT COUNT(*) FROM sales_note_details WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);

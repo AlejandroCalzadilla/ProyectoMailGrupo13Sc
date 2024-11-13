@@ -16,8 +16,17 @@ public class TratamientosN {
     private Timestamp actualizadoEn;
     private TratamientosM tratamientosM;
 
-    public TratamientosN() throws SQLException {
-        tratamientosM = new TratamientosM();
+    public TratamientosN(){
+
+    }
+    public TratamientosN( String medicamento, String notas ) throws SQLException {
+
+         this.medicamento = medicamento;
+         this.notas = notas;
+        // this.consultaId = consultaid;
+         this.creadoEn=(Timestamp.valueOf(java.time.LocalDateTime.now()));
+         this.actualizadoEn=(Timestamp.valueOf(java.time.LocalDateTime.now()));
+
     }
 
     // Getters and Setters
@@ -69,11 +78,14 @@ public class TratamientosN {
         this.actualizadoEn = actualizadoEn;
     }
 
-    // CRUD Methods
+
+
     public List<TratamientosN> obtenerTratamientos() throws SQLException {
         return mapear(tratamientosM.obtenerTratamientos());
     }
 
+
+    /*
     public String agregarTratamiento(String medicamento, String notas, int consultaId) throws SQLException {
         try {
             validarCampos(medicamento, notas, consultaId);
@@ -133,7 +145,7 @@ public class TratamientosN {
         return tratamientosMObj;
     }
 
-    private void validarCampos(String medicamento, String notas, int consultaId) {
+    private void validarCamposTratamientos(String medicamento, String notas, int consultaId) {
         if (medicamento == null || medicamento.isEmpty()) {
             throw new IllegalArgumentException("El medicamento no puede estar vacío");
         }

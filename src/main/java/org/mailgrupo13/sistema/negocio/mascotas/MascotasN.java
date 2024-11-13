@@ -29,7 +29,7 @@ public class MascotasN {
 
 
 
-     public MascotasN leerMascota(int id) throws SQLException {
+     public String leerMascota(int id) throws SQLException {
        return mascotasService.leerMascota(id);
      }
 
@@ -141,15 +141,15 @@ public class MascotasN {
 
     @Override
     public String toString() {
-        return "MascotasN{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", peso=" + peso +
-                ", color='" + color + '\'' +
-                ", fechaNacimiento=" + fechaNacimiento +
-                ", urlFoto='" + urlFoto + '\'' +
-                ", idCliente=" + idCliente +
-                ", idRaza=" + idRaza +
-                '}';
+        return "-----Mascota = " +'\n'+
+                " id=" + id +
+                " nombre='" + nombre + '\n' +
+                " peso=" + peso + '\n' +
+                " color='" + color + '\n' +
+                " fechaNacimiento=" + fechaNacimiento +'\n'+
+                " urlFoto='" + urlFoto + '\n' +
+                " idCliente=" + idCliente +
+                ", idRaza=" + idRaza
+                ;
     }
 }

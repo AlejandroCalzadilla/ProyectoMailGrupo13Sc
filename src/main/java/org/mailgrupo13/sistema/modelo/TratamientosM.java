@@ -76,83 +76,33 @@ public class TratamientosM {
     // Métodos CRUD
 
 
-    public boolean agregarConsultaConTratamientos(Date fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId, List<TratamientosM> tratamientos) throws SQLException {
 
-        try {
-            //conn = DriverManager.getConnection("jdbc:your_database_url");
-            conn.setAutoCommit(false);
-
-            // Create consultation
-            String consultaSql = "INSERT INTO medical_consultations (date, reason, diagnosis, consultation_fee, pet_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement consultaStmt = conn.prepareStatement(consultaSql, Statement.RETURN_GENERATED_KEYS)) {
-                consultaStmt.setDate(1, fecha);
-                consultaStmt.setString(2, motivo);
-                consultaStmt.setString(3, diagnostico);
-                consultaStmt.setFloat(4, tarifaConsulta);
-                consultaStmt.setInt(5, petId);
-                consultaStmt.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
-                consultaStmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
-                consultaStmt.executeUpdate();
-
-                ResultSet generatedKeys = consultaStmt.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    int consultaId = generatedKeys.getInt(1);
-
-                    // Create treatments
-                    String tratamientoSql = "INSERT INTO treatments (medication, notes, consultation_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?)";
-                    try (PreparedStatement tratamientoStmt = conn.prepareStatement(tratamientoSql)) {
-                        for (TratamientosM tratamiento : tratamientos) {
-                            tratamientoStmt.setString(1, tratamiento.getMedicamento());
-                            tratamientoStmt.setString(2, tratamiento.getNotas());
-                            tratamientoStmt.setInt(3, consultaId);
-                            tratamientoStmt.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
-                            tratamientoStmt.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
-                            tratamientoStmt.executeUpdate();
-                        }
-                    }
-                }
+    public List<TratamientosM> buscarPorConsultaId(int consultaId) throws SQLException {
+        List<TratamientosM> tratamientos = new ArrayList<>();
+        String sql = "SELECT * FROM treatments WHERE consultation_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, consultaId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                TratamientosM tratamiento = new TratamientosM();
+                tratamiento.setId(rs.getInt("id"));
+                tratamiento.setMedicamento(rs.getString("medication"));
+                tratamiento.setNotas(rs.getString("notes"));
+                tratamiento.setConsultaId(rs.getInt("consultation_id"));
+                tratamiento.setCreadoEn(rs.getTimestamp("created_at"));
+                tratamiento.setActualizadoEn(rs.getTimestamp("updated_at"));
+                tratamientos.add(tratamiento);
             }
-            conn.commit();
-            return true;
         } catch (SQLException e) {
-            if (conn != null) {
-                conn.rollback();
-
-            }
-            throw e;
-        } finally {
-            if (conn != null) {
-                conn.setAutoCommit(true);
-                conn.close();
-            }
+            e.printStackTrace();
         }
+        return tratamientos;
     }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // Crear un tratamiento
+    /*
     public boolean crearTratamiento() {
         if (!existeConsulta(consultaId)) {
             throw new IllegalArgumentException("No existe una consulta con el ID proporcionado: " + consultaId);
@@ -172,6 +122,12 @@ public class TratamientosM {
             throw new IllegalArgumentException("Error al crear el tratamiento: " + e.getMessage(), e);
         }
     }
+
+     */
+
+
+
+
 
     // Leer un tratamiento por ID
     public TratamientosM leerTratamiento(int id) {

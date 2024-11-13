@@ -64,7 +64,7 @@ public class ComandoEmail {
         String respuesta = "";
         if (entidad.equals("CLIENTES")) {
             ClientesN clientesN = new ClientesN();
-            respuesta = clientesN.agregarCliente("nombre", "apellido", "telefono", "genero", "fechanaciemiento", 1);
+            respuesta = clientesN.agregarCliente("nombre", "apellido", "telefono", "genero", "fechanaciemiento", "email", "password");
         } else if (entidad.equals("MEDICAMENTOS")) {
             respuesta = "Listado de medicamentos";
         } else if (entidad.equals("ESPECIES")) {

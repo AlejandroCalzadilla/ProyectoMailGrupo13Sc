@@ -16,7 +16,7 @@ public class ConsultasMedicasM {
     private int petId;
     private Timestamp creadoEn;
     private Timestamp actualizadoEn;
-
+    private int userId;
     private Conexion conexion;
     private Connection conn;
 
@@ -91,27 +91,91 @@ public class ConsultasMedicasM {
         this.actualizadoEn = actualizadoEn;
     }
 
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
 
 
 
 
-    public boolean agregarConsultaConTratamientos(Date fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId, List<TratamientosM> tratamientos) throws SQLException {
-        //Connection conn = null;
+
+
+    public ConsultasMedicasM leerConsulta(int id) throws SQLException {
+        String sql = "SELECT * FROM medical_consultations WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                ConsultasMedicasM consulta = new ConsultasMedicasM();
+                consulta.setId(rs.getInt("id"));
+                consulta.setFecha(rs.getDate("date"));
+                consulta.setMotivo(rs.getString("reason"));
+                consulta.setDiagnostico(rs.getString("diagnosis"));
+                consulta.setTarifaConsulta(rs.getFloat("consultation_fee"));
+                consulta.setPetId(rs.getInt("pet_id"));
+                consulta.setUserId(rs.getInt("user_id"));
+                consulta.setCreadoEn(rs.getTimestamp("created_at"));
+                consulta.setActualizadoEn(rs.getTimestamp("updated_at"));
+                return consulta;
+            } else {
+                throw new IllegalArgumentException("No existe una consulta médica con el ID proporcionado: " + id);
+            }
+        } catch (SQLException e) {
+            throw new IllegalArgumentException("Error al leer la consulta médica: " + e.getMessage(), e);
+        }
+    }
+
+
+
+    public List<ConsultasMedicasM> leerConsultaPorMascota(int petId) throws SQLException {
+        List<ConsultasMedicasM> consultas = new ArrayList<>();
+        String sql = "SELECT * FROM medical_consultations WHERE pet_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, petId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                ConsultasMedicasM consulta = new ConsultasMedicasM();
+                consulta.setId(rs.getInt("id"));
+                consulta.setFecha(rs.getDate("date"));
+                consulta.setMotivo(rs.getString("reason"));
+                consulta.setDiagnostico(rs.getString("diagnosis"));
+                consulta.setTarifaConsulta(rs.getFloat("consultation_fee"));
+                consulta.setPetId(rs.getInt("pet_id"));
+                consulta.setUserId(rs.getInt("user_id"));
+                consulta.setCreadoEn(rs.getTimestamp("created_at"));
+                consulta.setActualizadoEn(rs.getTimestamp("updated_at"));
+                consultas.add(consulta);
+            }
+        } catch (SQLException e) {
+            throw new IllegalArgumentException("Error al leer las consultas médicas: " + e.getMessage(), e);
+        }
+        return consultas;
+    }
+
+
+
+
+
+    public boolean agregarConsultaConTratamientos(Date fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId, int userId, List<TratamientosM> tratamientos) throws SQLException {
         try {
-
             conn.setAutoCommit(false);
 
             // Create consultation
-            String consultaSql = "INSERT INTO medical_consultations (date, reason, diagnosis, consultation_fee, pet_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String consultaSql = "INSERT INTO medical_consultations (date, reason, diagnosis, consultation_fee, pet_id, user_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement consultaStmt = conn.prepareStatement(consultaSql, Statement.RETURN_GENERATED_KEYS)) {
                 consultaStmt.setDate(1, fecha);
                 consultaStmt.setString(2, motivo);
                 consultaStmt.setString(3, diagnostico);
                 consultaStmt.setFloat(4, tarifaConsulta);
                 consultaStmt.setInt(5, petId);
-                consultaStmt.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+                consultaStmt.setInt(6, userId);
                 consultaStmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+                consultaStmt.setTimestamp(8, new Timestamp(System.currentTimeMillis()));
                 consultaStmt.executeUpdate();
 
                 ResultSet generatedKeys = consultaStmt.getGeneratedKeys();
@@ -148,23 +212,21 @@ public class ConsultasMedicasM {
         }
     }
 
-
-
-
-    public boolean actualizarConsultaConTratamientos(int consultaId, Date fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId, List<TratamientosM> tratamientos) throws SQLException {
+    public boolean actualizarConsultaConTratamientos(int consultaId, Date fecha, String motivo, String diagnostico, Float tarifaConsulta, int petId, int userId, List<TratamientosM> tratamientos) throws SQLException {
         try {
             conn.setAutoCommit(false);
 
             // Update consultation
-            String consultaSql = "UPDATE medical_consultations SET date = ?, reason = ?, diagnosis = ?, consultation_fee = ?, pet_id = ?, updated_at = ? WHERE id = ?";
+            String consultaSql = "UPDATE medical_consultations SET date = ?, reason = ?, diagnosis = ?, consultation_fee = ?, pet_id = ?, user_id = ?, updated_at = ? WHERE id = ?";
             try (PreparedStatement consultaStmt = conn.prepareStatement(consultaSql)) {
                 consultaStmt.setDate(1, fecha);
                 consultaStmt.setString(2, motivo);
                 consultaStmt.setString(3, diagnostico);
                 consultaStmt.setFloat(4, tarifaConsulta);
                 consultaStmt.setInt(5, petId);
-                consultaStmt.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
-                consultaStmt.setInt(7, consultaId);
+                consultaStmt.setInt(6, userId);
+                consultaStmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+                consultaStmt.setInt(8, consultaId);
                 consultaStmt.executeUpdate();
             }
 
@@ -202,44 +264,6 @@ public class ConsultasMedicasM {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-    // Métodos CRUD
-
-    // Crear una consulta médica
-    /*
-    public boolean crearConsultaMedica() {
-        if (!existeMascota(petId)) {
-            throw new IllegalArgumentException("No existe una mascota con el ID proporcionado: " + petId);
-        }
-
-        String sql = "INSERT INTO medical_consultations (date, reason, diagnosis, consultation_fee, pet_id, created_at, updated_at) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDate(1, fecha);
-            stmt.setString(2, motivo);
-            stmt.setString(3, diagnostico);
-            stmt.setFloat(4, tarifaConsulta);
-            stmt.setInt(5, petId);
-            stmt.setTimestamp(6, creadoEn);
-            stmt.setTimestamp(7, actualizadoEn);
-            stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            throw new IllegalArgumentException("Error al crear la consulta médica: " + e.getMessage(), e);
-        }
-    }*/
-
-    // Leer una consulta médica por ID
     public ConsultasMedicasM leerConsultaMedica(int id) {
         String sql = "SELECT * FROM medical_consultations WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -253,6 +277,7 @@ public class ConsultasMedicasM {
                 consulta.setDiagnostico(rs.getString("diagnosis"));
                 consulta.setTarifaConsulta(rs.getFloat("consultation_fee"));
                 consulta.setPetId(rs.getInt("pet_id"));
+                consulta.setUserId(rs.getInt("user_id"));
                 consulta.setCreadoEn(rs.getTimestamp("created_at"));
                 consulta.setActualizadoEn(rs.getTimestamp("updated_at"));
                 return consulta;
@@ -263,37 +288,6 @@ public class ConsultasMedicasM {
             throw new IllegalArgumentException("Error al leer la consulta médica: " + e.getMessage(), e);
         }
     }
-
-    // Actualizar una consulta médica
-
-
-    /*
-    public boolean actualizarConsultaMedica() {
-        if (!existeConsultaMedica(id)) {
-            throw new IllegalArgumentException("No existe una consulta médica con el ID proporcionado: " + id);
-        }
-        if (!existeMascota(petId)) {
-            throw new IllegalArgumentException("No existe una mascota con el ID proporcionado: " + petId);
-        }
-
-        String sql = "UPDATE medical_consultations SET date = ?, reason = ?, diagnosis = ?, consultation_fee = ?, " +
-                "pet_id = ?, updated_at = ? WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDate(1, fecha);
-            stmt.setString(2, motivo);
-            stmt.setString(3, diagnostico);
-            stmt.setFloat(4, tarifaConsulta);
-            stmt.setInt(5, petId);
-            stmt.setTimestamp(6, actualizadoEn);
-            stmt.setInt(7, id);
-            stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            throw new IllegalArgumentException("Error al actualizar la consulta médica: " + e.getMessage(), e);
-        }
-    }
-    */
-    // Eliminar una consulta médica
 
     public boolean eliminarConsultaConTratamientos(int consultaId) throws SQLException {
         try {
@@ -327,23 +321,6 @@ public class ConsultasMedicasM {
         }
     }
 
-    /*
-    public boolean eliminarConsultaMedica(int id) {
-        if (!existeConsultaMedica(id)) {
-            throw new IllegalArgumentException("No existe una consulta médica con el ID proporcionado: " + id);
-        }
-
-        String sql = "DELETE FROM medical_consultations WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            throw new IllegalArgumentException("Error al eliminar la consulta médica: " + e.getMessage(), e);
-        }
-    }*/
-
-    // Obtener todas las consultas médicas
     public List<ConsultasMedicasM> obtenerConsultasMedicas() {
         List<ConsultasMedicasM> consultas = new ArrayList<>();
         String sql = "SELECT * FROM medical_consultations";
@@ -357,6 +334,7 @@ public class ConsultasMedicasM {
                 consulta.setDiagnostico(rs.getString("diagnosis"));
                 consulta.setTarifaConsulta(rs.getFloat("consultation_fee"));
                 consulta.setPetId(rs.getInt("pet_id"));
+                consulta.setUserId(rs.getInt("user_id"));
                 consulta.setCreadoEn(rs.getTimestamp("created_at"));
                 consulta.setActualizadoEn(rs.getTimestamp("updated_at"));
                 consultas.add(consulta);
@@ -367,7 +345,6 @@ public class ConsultasMedicasM {
         return consultas;
     }
 
-    // Verificar si una consulta médica existe por ID
     private boolean existeConsultaMedica(int id) {
         String sql = "SELECT COUNT(*) FROM medical_consultations WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -382,7 +359,6 @@ public class ConsultasMedicasM {
         return false;
     }
 
-    // Verificar si una mascota existe por ID
     private boolean existeMascota(int petId) {
         String sql = "SELECT COUNT(*) FROM pets WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {

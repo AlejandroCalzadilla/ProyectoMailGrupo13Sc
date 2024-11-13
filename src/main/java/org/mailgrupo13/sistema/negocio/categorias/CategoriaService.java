@@ -55,6 +55,7 @@ public class CategoriaService {
     public String mapeard(List<CategoriasM> especiesM) throws SQLException {
         StringBuilder sb = new StringBuilder();
         String format = "%-5s %-30s %-30s %-30s%n";
+        sb.append("Categoria Lista ---------------------- ");
         sb.append(String.format(format, "ID", "Nombre", "Creado En", "Actualizado En"));
         sb.append("---------------------------------------------------------------------------\n");
         for (CategoriasM especieM : especiesM) {

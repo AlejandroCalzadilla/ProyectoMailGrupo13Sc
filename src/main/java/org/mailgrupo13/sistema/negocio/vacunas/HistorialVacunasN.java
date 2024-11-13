@@ -71,7 +71,7 @@ public class HistorialVacunasN {
     }
 
     // CRUD Methods
-    public List<HistorialVacunasN> obtenerHistorialesVacunas() throws SQLException {
+    public String obtenerHistorialesVacunas() throws SQLException {
         return mapear(historialVacunasM.obtenerHistorialesVacunas());
     }
 
@@ -102,20 +102,29 @@ public class HistorialVacunasN {
         return historialVacunasM.eliminarHistorialVacuna(id);
     }
 
-    private List<HistorialVacunasN> mapear(List<HistorialVacunasM> historialVacunasMList) throws SQLException {
-        List<HistorialVacunasN> historialVacunasNList = new ArrayList<>();
+    private String mapear(List<HistorialVacunasM> historialVacunasMList) throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        String format = "%-5s %-10s %-15s %-30s %-30s %-30s%n";
+        sb.append(String.format(format, "ID", "Pet ID", "Vaccination ID", "Creado En", "Actualizado En", "Siguiente Fecha Vencimiento"));
+        sb.append("------------------------------------------------------------------------------------------------------------\n");
         for (HistorialVacunasM historialVacunasM : historialVacunasMList) {
-            HistorialVacunasN historialVacunasN = new HistorialVacunasN();
-            historialVacunasN.setId(historialVacunasM.getId());
-            historialVacunasN.setPetId(historialVacunasM.getPetId());
-            historialVacunasN.setVaccinationId(historialVacunasM.getVaccinationId());
-            historialVacunasN.setCreadoEn(historialVacunasM.getCreadoEn());
-            historialVacunasN.setActualizadoEn(historialVacunasM.getActualizadoEn());
-            historialVacunasN.setSiguienteFechaVencimiento(historialVacunasM.getSiguienteFechaVencimiento());
-            historialVacunasNList.add(historialVacunasN);
+            sb.append(String.format(format,
+                    historialVacunasM.getId(),
+                    historialVacunasM.getPetId(),
+                    historialVacunasM.getVaccinationId(),
+                    historialVacunasM.getCreadoEn(),
+                    historialVacunasM.getActualizadoEn(),
+                    historialVacunasM.getSiguienteFechaVencimiento()));
         }
-        return historialVacunasNList;
+        return sb.toString();
     }
+
+
+    public String buscarPorMascotaId(int id) throws SQLException {
+        return  mapear(historialVacunasM.obtenerHistorialesVacunasPorMascota(id));
+    }
+
+
 
     private HistorialVacunasM cargar(int id, int petId, int vaccinationId, Date siguienteFechaVencimiento) throws SQLException {
         HistorialVacunasM historialVacunasMObj = new HistorialVacunasM();
