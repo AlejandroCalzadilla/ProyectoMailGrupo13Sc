@@ -25,9 +25,7 @@ public class ServicioEmail {
         for (int i = 1; i <= totalCorreos; i++) {
             String correo = clientePOP.obtenerCorreo(i);
             //String correo = clientePOP.obtenerCorreoYEliminar(i);
-            // acá guardamos en la base de datos el correo
             guardarCorreo(correo);
-            // After saving the email, we evaluate and respond if necessary
             evaluarYResponderCorreo(correo);
         }
         clientePOP.desconectar();
