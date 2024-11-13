@@ -42,7 +42,6 @@ public class ClientesService {
 
     // ClientesService.java
     public String agregarCliente(String nombre, String apellido, String telefono, String genero, String fechanaciemiento, String email, String password) throws SQLException {
-        ClienteValidator.validarCampos(nombre, apellido, telefono, genero, fechanaciemiento, 0); // Assuming 0 for idUsuario as it will be set later
 
         // Create user and get user ID
         UsuariosM usuariosMObj = new UsuariosM();
@@ -50,6 +49,7 @@ public class ClientesService {
         usuariosMObj.setPassword(password);
         usuariosMObj.setNombre(nombre);
         int userId = usuariosMObj.crearUsuarioYRetornarId();
+        ClienteValidator.validarCampos(nombre, apellido, telefono, genero, fechanaciemiento, userId);
 
         // Create client with the obtained user ID
         ClienteM clienteMObj = cargar(0, nombre, apellido, telefono, genero, fechanaciemiento, userId);

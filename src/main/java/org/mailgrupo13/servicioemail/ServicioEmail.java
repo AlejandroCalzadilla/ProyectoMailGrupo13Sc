@@ -23,8 +23,8 @@ public class ServicioEmail {
         clientePOP.conectar();
         int totalCorreos = clientePOP.obtenerTotalDeCorreos();
         for (int i = 1; i <= totalCorreos; i++) {
-            String correo = clientePOP.obtenerCorreo(i);
-            //String correo = clientePOP.obtenerCorreoYEliminar(i);
+            //String correo = clientePOP.obtenerCorreo(i);
+            String correo = clientePOP.obtenerCorreoYEliminar(i);
             guardarCorreo(correo);
             evaluarYResponderCorreo(correo);
         }
@@ -52,8 +52,12 @@ public class ServicioEmail {
 
     private String extraerRemitente(String correo) {
         for (String line : correo.split("\n")) {
-            if (line.startsWith("From:")) {
-                return line.substring(6).trim();
+            if (line.startsWith("Return-Path:")) {
+                int start = line.indexOf('<') + 1;
+                int end = line.indexOf('>');
+                if (start > 0 && end > start) {
+                    return line.substring(start, end).trim();
+                }
             }
         }
         return null;
@@ -61,11 +65,11 @@ public class ServicioEmail {
 
     public static void main(String[] args) throws IOException, SQLException {
         ServicioEmail servicioEmail = new ServicioEmail();
-        servicioEmail.revisarCorreos();
+        //servicioEmail.revisarCorreos();
 
         // Programar el apagado automático después de 15 segundos
-        /*ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.schedule(servicioEmail::detener, 40, TimeUnit.SECONDS);
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.schedule(servicioEmail::detener, 120, TimeUnit.SECONDS);
         while (servicioEmail.conectado) {
             servicioEmail.revisarCorreos();
 
@@ -75,17 +79,17 @@ public class ServicioEmail {
                 System.out.println("Interrupción en el ciclo de revisión: " + e.getMessage());
             }
         }
-        scheduler.shutdown();*/
+        scheduler.shutdown();
     }
 
     private void evaluarYResponderCorreo(String correo) throws SQLException {
         String subject = extraerSubject(correo);
         String remitente = extraerRemitente(correo);
-        if (subject != null) {
+        if (subject != null && remitente != null) {
             String respuesta = procesarCorreo(subject);
             if (!respuesta.isEmpty()) {
                 System.out.println(respuesta);
-                //clienteSMTP.enviarCorreo(remitente, "Resultado de la Consulta", respuesta);
+                clienteSMTP.enviarCorreo(remitente, "Resultado de la Consulta", respuesta);
             }
         }
     }
