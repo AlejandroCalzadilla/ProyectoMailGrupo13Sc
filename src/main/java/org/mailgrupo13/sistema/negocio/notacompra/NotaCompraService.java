@@ -27,7 +27,7 @@ public class NotaCompraService {
         List<NotaCompraM> notaCompras = notaCompraM.obtenerNotasCompra();
         StringBuilder sb = new StringBuilder();
         String notaCompraFormat = "%-5s %-10s %-15s %-15s %-10s %-10s %-10s  %-30s%n";
-        sb.append("NotaCompra:\n");
+        sb.append("NotaCompra:\r\n");
         sb.append(String.format(notaCompraFormat, "ID", "Fecha", "Monto Total", "Proveedor ID", "Almacen ID", "User ID", "Creado En", "Actualizado En"));
         sb.append("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
         for (NotaCompraM notaCompra : notaCompras) {
@@ -132,7 +132,7 @@ public class NotaCompraService {
 
         StringBuilder sb = new StringBuilder();
         String notaCompraFormat = "%-5s %-20s %-15s %-15s %-10s %-10s %-10s  %-30s%n";
-        sb.append("NotaCompra:\n");
+        sb.append("NotaCompra:\r\n");
         sb.append(String.format(notaCompraFormat, "ID", "Fecha", "Monto Total", "Proveedor ID", "Almacen ID", "User ID", "Creado En", "Actualizado En"));
         sb.append("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
         sb.append(String.format(notaCompraFormat,
@@ -146,7 +146,7 @@ public class NotaCompraService {
                 notaCompra.getActualizadoEn()));
 
         String detalleFormat = "%-5s %-10s %-10s %-15s %-15s %-10s %-10s %-30s %-30s%n";
-        sb.append("\nDetalles:\n");
+        sb.append("\r\nDetalles:\r\n");
         sb.append(String.format(detalleFormat, "ID", "id_nota" ,"Cantidad", "Precio Compra", "Porcentaje", "Subtotal", "Medicamento ID", "Creado En", "Actualizado En"));
         sb.append("------------------------------------------------------------------------------------------------------------------------\n");
         for (DetalleNotaCompraM detalle : detalles) {

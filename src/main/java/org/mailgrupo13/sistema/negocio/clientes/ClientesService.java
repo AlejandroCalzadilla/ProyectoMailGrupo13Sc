@@ -133,13 +133,13 @@ public class ClientesService {
 
         // Format the results
         StringBuilder sb = new StringBuilder();
-        sb.append("Cliente: ").append(clienteNombre).append("\n\n");
+        sb.append("Cliente: ").append(clienteNombre).append("\r\n");
 
         // Format sales notes
-        sb.append("Notas de Venta:\n");
+        sb.append("Notas de Venta:\r\n");
         String notaVentaFormat = "%-5s %-10s %-15s %-10s %-10s%n";
         sb.append(String.format(notaVentaFormat, "ID", "Fecha", "Monto Total", "Almacen ID", "User ID"));
-        sb.append("------------------------------------------------------------\n");
+        sb.append("------------------------------------------------------------\r\n");
         for (NotaVentaM notaVenta : notasVenta) {
             sb.append(String.format(notaVentaFormat,
                     notaVenta.getId(),
@@ -150,10 +150,10 @@ public class ClientesService {
         }
 
         // Format medical consultations
-        sb.append("\nConsultas Médicas:\n");
+        sb.append("\r\nConsultas Médicas:\r\n");
         String consultaMedicaFormat = "%-5s %-10s %-15s %-15s %-10s %-10s%n";
         sb.append(String.format(consultaMedicaFormat, "ID", "Fecha", "Motivo", "Diagnóstico", "Tarifa", "User ID"));
-        sb.append("--------------------------------------------------------------------------\n");
+        sb.append("--------------------------------------------------------------------------\r\n");
         for (ConsultasMedicasM consulta : consultasMedicas) {
             sb.append(String.format(consultaMedicaFormat,
                     consulta.getId(),

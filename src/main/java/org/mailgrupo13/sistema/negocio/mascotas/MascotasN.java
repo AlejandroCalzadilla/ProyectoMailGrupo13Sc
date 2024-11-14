@@ -141,13 +141,13 @@ public class MascotasN {
 
     @Override
     public String toString() {
-        return "-----Mascota = " +'\n'+
+        return "-----Mascota = " +'\r'+'\n'+
                 " id=" + id +
-                " nombre='" + nombre + '\n' +
-                " peso=" + peso + '\n' +
-                " color='" + color + '\n' +
-                " fechaNacimiento=" + fechaNacimiento +'\n'+
-                " urlFoto='" + urlFoto + '\n' +
+                " nombre='" + nombre + '\r'+'\n' +
+                " peso=" + peso + '\r'+'\n' +
+                " color='" + color + '\r'+'\n' +
+                " fechaNacimiento=" + fechaNacimiento +'\r'+'\n'+
+                " urlFoto='" + urlFoto + '\r'+'\n' +
                 " idCliente=" + idCliente +
                 ", idRaza=" + idRaza
                 ;

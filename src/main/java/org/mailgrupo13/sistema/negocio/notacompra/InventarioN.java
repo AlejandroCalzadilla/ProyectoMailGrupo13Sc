@@ -87,7 +87,7 @@ public class InventarioN {
         String rowFormat = "%-10d %-15d %-10.2f %-10d %-10d %-30s %-30s%n";
 
         sb.append(String.format(headerFormat, "ID", "Bodega ID", "Precio", "Stock", "Medicamento ID", "Creado En", "Actualizado En"));
-        sb.append("------------------------------------------------------------------------------------------------------------\n");
+        sb.append("------------------------------------------------------------------------------------------------------------\r\n");
 
         for (InventarioM inventario : inventarios) {
             sb.append(String.format(rowFormat,

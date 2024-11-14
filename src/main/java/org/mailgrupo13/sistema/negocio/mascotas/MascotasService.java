@@ -37,7 +37,7 @@ public class MascotasService {
         HistorialVacunasN historialVacunasN = new HistorialVacunasN();
         String historialVacunasMList = historialVacunasN.buscarPorMascotaId(id);
 
-        return  mascota.toString()+ "\n" + "vacunas de la mascota"+"\n" +historialVacunasMList;
+        return  mascota.toString()+ "\r\n" + "vacunas de la mascota"+"\r\n" +historialVacunasMList;
     }
 
 

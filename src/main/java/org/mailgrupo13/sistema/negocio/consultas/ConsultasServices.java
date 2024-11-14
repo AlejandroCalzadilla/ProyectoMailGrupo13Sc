@@ -95,7 +95,7 @@ public class ConsultasServices {
 
         StringBuilder sb = new StringBuilder();
         String consultaFormat = "%-5s %-10s %-20s %-20s %-15s %-10s %-10s %-30s %-30s%n";
-        sb.append("Consulta:\n");
+        sb.append("Consulta:\r\n");
         sb.append(String.format(consultaFormat, "ID", "Fecha", "Motivo", "Diagnóstico", "Tarifa", "Pet ID", "User ID", "Creado En", "Actualizado En"));
         sb.append("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
         sb.append(String.format(consultaFormat,
@@ -110,7 +110,7 @@ public class ConsultasServices {
                 consulta.getActualizadoEn()));
 
         String tratamientoFormat = "%-5s %-20s %-20s %-30s %-30s%n";
-        sb.append("\nTratamientos:\n");
+        sb.append("\r\nTratamientos:\r\n");
         sb.append(String.format(tratamientoFormat, "ID", "Medicamento", "Notas", "Creado En", "Actualizado En"));
         sb.append("------------------------------------------------------------------------------------------------------------------------\n");
         for (TratamientosM tratamiento : tratamientos) {
@@ -131,7 +131,7 @@ public class ConsultasServices {
         List<ConsultasMedicasM> consultas = consultasMedicasM.leerConsultaPorMascota(petId);
         StringBuilder sb = new StringBuilder();
         String consultaFormat = "%-5s %-10s %-20s %-20s %-15s %-10s %-10s %-30s %-30s%n";
-        sb.append("Consultas:\n");
+        sb.append("Consultas:\r\n");
         sb.append(String.format(consultaFormat, "ID", "Fecha", "Motivo", "Diagnóstico", "Tarifa", "Pet ID", "User ID", "Creado En", "Actualizado En"));
         sb.append("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
         for (ConsultasMedicasM consulta : consultas) {
@@ -148,9 +148,9 @@ public class ConsultasServices {
 
             List<TratamientosM> tratamientos = new TratamientosM().buscarPorConsultaId(consulta.getId());
             String tratamientoFormat = "%-5s %-20s %-20s %-30s %-30s%n";
-            sb.append("\nTratamientos:\n");
+            sb.append("\r\nTratamientos:\r\n");
             sb.append(String.format(tratamientoFormat, "ID", "Medicamento", "Notas", "Creado En", "Actualizado En"));
-            sb.append("------------------------------------------------------------------------------------------------------------------------\n");
+            sb.append("------------------------------------------------------------------------------------------------------------------------\r\n");
             for (TratamientosM tratamiento : tratamientos) {
                 sb.append(String.format(tratamientoFormat,
                         tratamiento.getId(),
@@ -159,7 +159,7 @@ public class ConsultasServices {
                         tratamiento.getCreadoEn(),
                         tratamiento.getActualizadoEn()));
             }
-            sb.append("\n");
+            sb.append("\r\n");
         }
         return sb.toString();
     }

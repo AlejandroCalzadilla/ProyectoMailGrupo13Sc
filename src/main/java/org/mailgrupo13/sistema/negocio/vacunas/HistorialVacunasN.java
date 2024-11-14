@@ -106,7 +106,7 @@ public class HistorialVacunasN {
         StringBuilder sb = new StringBuilder();
         String format = "%-5s %-10s %-15s %-30s %-30s %-30s%n";
         sb.append(String.format(format, "ID", "Pet ID", "Vaccination ID", "Creado En", "Actualizado En", "Siguiente Fecha Vencimiento"));
-        sb.append("------------------------------------------------------------------------------------------------------------\n");
+        sb.append("------------------------------------------------------------------------------------------------------------\r\n");
         for (HistorialVacunasM historialVacunasM : historialVacunasMList) {
             sb.append(String.format(format,
                     historialVacunasM.getId(),
