@@ -124,10 +124,13 @@ public class NotaCompraM {
 
 
     // Create NotaCompra with details
+    // Create NotaCompra with details and update inventory
     public String crearNotaCompra(NotaCompraM notaCompra, List<DetalleNotaCompraM> detalles) throws SQLException {
         String sqlNota = "INSERT INTO purchase_note (purchase_date, total_amount, supplier_id, warehouse_id, user_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlDetalle = "INSERT INTO purchase_note_details (quantity, purchase_price, percentage, subtotal, purchase_note_id, medicament_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        String sqlUpdateInventory = "UPDATE inventory SET stock = stock + ?, price = ? WHERE medicament_id = ?";
+        String sqlSelectInventory = "SELECT id, stock FROM inventory WHERE medicament_id = ? AND warehouse_id = ?";
+        String sqlUpdateInventory = "UPDATE inventory SET stock = stock + ? WHERE id = ?";
+        String sqlInsertInventory = "INSERT INTO inventory (stock, price, medicament_id, warehouse_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
             conn.setAutoCommit(false);
@@ -163,18 +166,180 @@ public class NotaCompraM {
                     stmtDetalle.executeUpdate();
                 }
 
-                // Update Inventory
-                float newPrice = (detalle.getCantidad() * detalle.getPrecioCompra()) + (detalle.getPorcentaje() * (detalle.getCantidad() * detalle.getPrecioCompra()));
-                try (PreparedStatement stmtUpdateInventory = conn.prepareStatement(sqlUpdateInventory)) {
-                    stmtUpdateInventory.setInt(1, detalle.getCantidad());
-                    stmtUpdateInventory.setFloat(2, newPrice);
-                    stmtUpdateInventory.setInt(3, detalle.getMedicamentoId());
-                    stmtUpdateInventory.executeUpdate();
+                // Update or Insert Inventory
+                try (PreparedStatement stmtSelectInventory = conn.prepareStatement(sqlSelectInventory)) {
+                    stmtSelectInventory.setInt(1, detalle.getMedicamentoId());
+                    stmtSelectInventory.setInt(2, notaCompra.getAlmacenId());
+                    ResultSet rs = stmtSelectInventory.executeQuery();
+
+                    if (rs.next()) {
+                        int inventoryId = rs.getInt("id");
+                        try (PreparedStatement stmtUpdateInventory = conn.prepareStatement(sqlUpdateInventory)) {
+                            stmtUpdateInventory.setInt(1, detalle.getCantidad());
+                            stmtUpdateInventory.setInt(2, inventoryId);
+                            stmtUpdateInventory.executeUpdate();
+                        }
+                    } else {
+                        try (PreparedStatement stmtInsertInventory = conn.prepareStatement(sqlInsertInventory)) {
+                            stmtInsertInventory.setInt(1, detalle.getCantidad());
+                            stmtInsertInventory.setFloat(2, detalle.getPrecioCompra());
+                            stmtInsertInventory.setInt(3, detalle.getMedicamentoId());
+                            stmtInsertInventory.setInt(4, notaCompra.getAlmacenId());
+                            stmtInsertInventory.setTimestamp(5, detalle.getCreadoEn());
+                            stmtInsertInventory.setTimestamp(6, detalle.getActualizadoEn());
+                            stmtInsertInventory.executeUpdate();
+                        }
+                    }
                 }
             }
 
             conn.commit();
             return "Nota de compra creada";
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
+    }
+
+    // Update NotaCompra with details and update inventory
+    public void actualizarNotaCompra(NotaCompraM notaCompra, List<DetalleNotaCompraM> detalles) throws SQLException {
+        String sqlNota = "UPDATE purchase_note SET purchase_date = ?, total_amount = ?, supplier_id = ?, warehouse_id = ?, user_id = ?, updated_at = ? WHERE id = ?";
+        String sqlDetalle = "UPDATE purchase_note_details SET quantity = ?, purchase_price = ?, percentage = ?, subtotal = ?, updated_at = ? WHERE id = ?";
+        String sqlSelectInventory = "SELECT id, stock FROM inventory WHERE medicament_id = ? AND warehouse_id = ?";
+        String sqlUpdateInventory = "UPDATE inventory SET stock = stock + ? WHERE id = ?";
+        String sqlInsertInventory = "INSERT INTO inventory (stock, price, medicament_id, warehouse_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try {
+            conn.setAutoCommit(false);
+
+            // Update NotaCompra
+            try (PreparedStatement stmtNota = conn.prepareStatement(sqlNota)) {
+                stmtNota.setDate(1, notaCompra.getFechaCompra());
+                stmtNota.setFloat(2, notaCompra.getMontoTotal());
+                stmtNota.setInt(3, notaCompra.getProveedorId());
+                stmtNota.setInt(4, notaCompra.getAlmacenId());
+                stmtNota.setInt(5, notaCompra.getUserId());
+                stmtNota.setTimestamp(6, notaCompra.getActualizadoEn());
+                stmtNota.setInt(7, notaCompra.getId());
+                stmtNota.executeUpdate();
+            }
+
+            // Update DetalleNotaCompra and update Inventory
+            for (DetalleNotaCompraM detalle : detalles) {
+                try (PreparedStatement stmtDetalle = conn.prepareStatement(sqlDetalle)) {
+                    stmtDetalle.setInt(1, detalle.getCantidad());
+                    stmtDetalle.setFloat(2, detalle.getPrecioCompra());
+                    stmtDetalle.setFloat(3, detalle.getPorcentaje());
+                    stmtDetalle.setFloat(4, detalle.getSubtotal());
+                    stmtDetalle.setTimestamp(5, detalle.getActualizadoEn());
+                    stmtDetalle.setInt(6, detalle.getId());
+                    stmtDetalle.executeUpdate();
+                }
+
+                // Update or Insert Inventory
+                try (PreparedStatement stmtSelectInventory = conn.prepareStatement(sqlSelectInventory)) {
+                    stmtSelectInventory.setInt(1, detalle.getMedicamentoId());
+                    stmtSelectInventory.setInt(2, notaCompra.getAlmacenId());
+                    ResultSet rs = stmtSelectInventory.executeQuery();
+
+                    if (rs.next()) {
+                        int inventoryId = rs.getInt("id");
+                        try (PreparedStatement stmtUpdateInventory = conn.prepareStatement(sqlUpdateInventory)) {
+                            stmtUpdateInventory.setInt(1, detalle.getCantidad());
+                            stmtUpdateInventory.setInt(2, inventoryId);
+                            stmtUpdateInventory.executeUpdate();
+                        }
+                    } else {
+                        try (PreparedStatement stmtInsertInventory = conn.prepareStatement(sqlInsertInventory)) {
+                            stmtInsertInventory.setInt(1, detalle.getCantidad());
+                            stmtInsertInventory.setFloat(2, detalle.getPrecioCompra());
+                            stmtInsertInventory.setInt(3, detalle.getMedicamentoId());
+                            stmtInsertInventory.setInt(4, notaCompra.getAlmacenId());
+                            stmtInsertInventory.setTimestamp(5, detalle.getCreadoEn());
+                            stmtInsertInventory.setTimestamp(6, detalle.getActualizadoEn());
+                            stmtInsertInventory.executeUpdate();
+                        }
+                    }
+                }
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
+    }
+
+    // Delete NotaCompra by ID and update inventory
+    public void eliminarNotaCompra(int id) throws SQLException {
+        String sqlNota = "DELETE FROM purchase_note WHERE id = ?";
+        String sqlDetalle = "DELETE FROM purchase_note_details WHERE purchase_note_id = ?";
+        String sqlSelectDetalles = "SELECT medicament_id, quantity, warehouse_id FROM purchase_note_details WHERE purchase_note_id = ?";
+        String sqlSelectInventory = "SELECT id, stock FROM inventory WHERE medicament_id = ? AND warehouse_id = ? ORDER BY created_at ASC";
+        String sqlUpdateInventory = "UPDATE inventory SET stock = ? WHERE id = ?";
+        String sqlDeleteInventory = "DELETE FROM inventory WHERE id = ?";
+
+        try {
+            conn.setAutoCommit(false);
+
+            // Select DetalleNotaCompra to get medicament_id, quantity, and warehouse_id
+            List<int[]> detalles = new ArrayList<>();
+            try (PreparedStatement stmtSelectDetalles = conn.prepareStatement(sqlSelectDetalles)) {
+                stmtSelectDetalles.setInt(1, id);
+                ResultSet rs = stmtSelectDetalles.executeQuery();
+                while (rs.next()) {
+                    detalles.add(new int[]{rs.getInt("medicament_id"), rs.getInt("quantity"), rs.getInt("warehouse_id")});
+                }
+            }
+
+            // Reduce inventory stock
+            for (int[] detalle : detalles) {
+                int remainingStock = detalle[1];
+                try (PreparedStatement stmtSelectInventory = conn.prepareStatement(sqlSelectInventory)) {
+                    stmtSelectInventory.setInt(1, detalle[0]);
+                    stmtSelectInventory.setInt(2, detalle[2]);
+                    ResultSet rs = stmtSelectInventory.executeQuery();
+
+                    while (rs.next() && remainingStock > 0) {
+                        int inventoryId = rs.getInt("id");
+                        int currentStock = rs.getInt("stock");
+
+                        if (currentStock <= remainingStock) {
+                            remainingStock -= currentStock;
+                            try (PreparedStatement stmtDeleteInventory = conn.prepareStatement(sqlDeleteInventory)) {
+                                stmtDeleteInventory.setInt(1, inventoryId);
+                                stmtDeleteInventory.executeUpdate();
+                            }
+                        } else {
+                            int newStock = currentStock - remainingStock;
+                            remainingStock = 0;
+                            try (PreparedStatement stmtUpdateInventory = conn.prepareStatement(sqlUpdateInventory)) {
+                                stmtUpdateInventory.setInt(1, newStock);
+                                stmtUpdateInventory.setInt(2, inventoryId);
+                                stmtUpdateInventory.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Delete DetalleNotaCompra
+            try (PreparedStatement stmtDetalle = conn.prepareStatement(sqlDetalle)) {
+                stmtDetalle.setInt(1, id);
+                stmtDetalle.executeUpdate();
+            }
+
+            // Delete NotaCompra
+            try (PreparedStatement stmtNota = conn.prepareStatement(sqlNota)) {
+                stmtNota.setInt(1, id);
+                stmtNota.executeUpdate();
+            }
+
+            conn.commit();
         } catch (SQLException e) {
             conn.rollback();
             throw e;
@@ -206,84 +371,41 @@ public class NotaCompraM {
         }
     }
 
-    // Update NotaCompra with details
-    public void actualizarNotaCompra(NotaCompraM notaCompra, List<DetalleNotaCompraM> detalles) throws SQLException {
-        String sqlNota = "UPDATE purchase_note SET purchase_date = ?, total_amount = ?, supplier_id = ?, warehouse_id = ?, user_id = ?, updated_at = ? WHERE id = ?";
-        String sqlDetalle = "UPDATE purchase_note_details SET quantity = ?, purchase_price = ?, percentage = ?, subtotal = ?, updated_at = ? WHERE id = ?";
-        String sqlUpdateInventory = "UPDATE inventory SET stock = stock + ?, price = ? WHERE medicament_id = ?";
 
-        try {
-            conn.setAutoCommit(false);
+    public String obtenerComprasPorMes() throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        String format = "%-10s %-15s%n";
+        sb.append("Compras por Mes ---------------------\n");
+        sb.append(String.format(format, "Mes", "Total Compras"));
+        sb.append("-------------------------------------\n");
 
-            // Update NotaCompra
-            try (PreparedStatement stmtNota = conn.prepareStatement(sqlNota)) {
-                stmtNota.setDate(1, notaCompra.getFechaCompra());
-                stmtNota.setFloat(2, notaCompra.getMontoTotal());
-                stmtNota.setInt(3, notaCompra.getProveedorId());
-                stmtNota.setInt(4, notaCompra.getAlmacenId());
-                stmtNota.setInt(5, notaCompra.getUserId());
-                stmtNota.setTimestamp(6, notaCompra.getActualizadoEn());
-                stmtNota.setInt(7, notaCompra.getId());
-                stmtNota.executeUpdate();
+        String sql = "SELECT DATE_TRUNC('month', purchase_date) AS month, SUM(total_amount) AS total_purchases FROM purchase_note GROUP BY month ORDER BY month";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                sb.append(String.format(format, rs.getDate("month"), rs.getFloat("total_purchases")));
             }
-
-            // Update DetalleNotaCompra and Inventory
-            for (DetalleNotaCompraM detalle : detalles) {
-                try (PreparedStatement stmtDetalle = conn.prepareStatement(sqlDetalle)) {
-                    stmtDetalle.setInt(1, detalle.getCantidad());
-                    stmtDetalle.setFloat(2, detalle.getPrecioCompra());
-                    stmtDetalle.setFloat(3, detalle.getPorcentaje());
-                    stmtDetalle.setFloat(4, detalle.getSubtotal());
-                    stmtDetalle.setTimestamp(5, detalle.getActualizadoEn());
-                    stmtDetalle.setInt(6, detalle.getId());
-                    stmtDetalle.executeUpdate();
-                }
-
-                // Update Inventory
-                float newPrice = (detalle.getCantidad() * detalle.getPrecioCompra()) + (detalle.getPorcentaje() * (detalle.getCantidad() * detalle.getPrecioCompra()));
-                try (PreparedStatement stmtUpdateInventory = conn.prepareStatement(sqlUpdateInventory)) {
-                    stmtUpdateInventory.setInt(1, detalle.getCantidad());
-                    stmtUpdateInventory.setFloat(2, newPrice);
-                    stmtUpdateInventory.setInt(3, detalle.getMedicamentoId());
-                    stmtUpdateInventory.executeUpdate();
-                }
-            }
-
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
         }
+        return sb.toString();
     }
 
+    // Get number of purchases by supplier
+    public String obtenerComprasPorProveedor() throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        String format = "%-15s %-15s%n";
+        sb.append("Compras por Proveedor ---------------\n");
+        sb.append(String.format(format, "Proveedor ID", "Total Compras"));
+        sb.append("-------------------------------------\n");
+
+        String sql = "SELECT supplier_id, COUNT(*) AS total_purchases FROM purchase_note GROUP BY supplier_id ORDER BY total_purchases DESC";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                sb.append(String.format(format, rs.getInt("supplier_id"), rs.getInt("total_purchases")));
+            }
+        }
+        return sb.toString();
+    }
     // Delete NotaCompra by ID
-    public void eliminarNotaCompra(int id) throws SQLException {
-        String sqlNota = "DELETE FROM purchase_note WHERE id = ?";
-        String sqlDetalle = "DELETE FROM purchase_note_details WHERE purchase_note_id = ?";
 
-        try {
-            conn.setAutoCommit(false);
-
-            // Delete DetalleNotaCompra
-            try (PreparedStatement stmtDetalle = conn.prepareStatement(sqlDetalle)) {
-                stmtDetalle.setInt(1, id);
-                stmtDetalle.executeUpdate();
-            }
-
-            // Delete NotaCompra
-            try (PreparedStatement stmtNota = conn.prepareStatement(sqlNota)) {
-                stmtNota.setInt(1, id);
-                stmtNota.executeUpdate();
-            }
-
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
-        }
-    }
 }

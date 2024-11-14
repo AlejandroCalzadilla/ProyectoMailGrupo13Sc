@@ -4,7 +4,9 @@ import org.mailgrupo13.sistema.conexion.Conexion;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DetalleNotaCompraM {
 
@@ -134,6 +136,46 @@ public class DetalleNotaCompraM {
             throw new IllegalArgumentException("Error al leer el detalle de la nota de compra: " + e.getMessage(), e);
         }
     }
+
+
+
+
+    // Get total purchases by month
+    public List<Map<String, Object>> obtenerComprasPorMes() throws SQLException {
+        String sql = "SELECT DATE_TRUNC('month', purchase_date) AS month, SUM(total_amount) AS total_purchases FROM purchase_note GROUP BY month ORDER BY month";
+        List<Map<String, Object>> resultados = new ArrayList<>();
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> fila = new HashMap<>();
+                fila.put("month", rs.getDate("month"));
+                fila.put("total_purchases", rs.getFloat("total_purchases"));
+                resultados.add(fila);
+            }
+        }
+        return resultados;
+    }
+
+    // Get number of purchases by supplier
+    public List<Map<String, Object>> obtenerComprasPorProveedor() throws SQLException {
+        String sql = "SELECT supplier_id, COUNT(*) AS total_purchases FROM purchase_note GROUP BY supplier_id ORDER BY total_purchases DESC";
+        List<Map<String, Object>> resultados = new ArrayList<>();
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> fila = new HashMap<>();
+                fila.put("supplier_id", rs.getInt("supplier_id"));
+                fila.put("total_purchases", rs.getInt("total_purchases"));
+                resultados.add(fila);
+            }
+        }
+        return resultados;
+    }
+
+    // Get total sales by month
+
+
+
 
 
 

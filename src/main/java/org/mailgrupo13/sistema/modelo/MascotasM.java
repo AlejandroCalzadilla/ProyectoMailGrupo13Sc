@@ -89,6 +89,8 @@ public class MascotasM {
         }
     }
 
+
+
     // Leer una mascota por ID
     public MascotasM leerMascota(int id) {
         String sql = "SELECT * FROM pets WHERE id = ?";
@@ -115,6 +117,8 @@ public class MascotasM {
             throw new IllegalArgumentException("Error al leer la mascota: " + e.getMessage(), e);
         }
     }
+
+
 
     // Actualizar una mascota
     public String actualizarMascota() {

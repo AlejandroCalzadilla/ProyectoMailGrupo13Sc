@@ -80,8 +80,26 @@ public class InventarioN {
 
     // CRUD Methods
 
-    public List<InventarioN> obtenerInventarios() throws SQLException {
-        return mapear(inventarioM.obtenerInventarios());
+    public String obtenerInventarios() throws SQLException {
+        List<InventarioM> inventarios = inventarioM.obtenerInventarios();
+        StringBuilder sb = new StringBuilder();
+        String headerFormat = "%-10s %-15s %-10s %-10s %-10s %-30s %-30s%n";
+        String rowFormat = "%-10d %-15d %-10.2f %-10d %-10d %-30s %-30s%n";
+
+        sb.append(String.format(headerFormat, "ID", "Bodega ID", "Precio", "Stock", "Medicamento ID", "Creado En", "Actualizado En"));
+        sb.append("------------------------------------------------------------------------------------------------------------\n");
+
+        for (InventarioM inventario : inventarios) {
+            sb.append(String.format(rowFormat,
+                    inventario.getId(),
+                    inventario.getBodegaId(),
+                    inventario.getPrecio(),
+                    inventario.getStock(),
+                    inventario.getMedicamentoId(),
+                    inventario.getCreadoEn(),
+                    inventario.getActualizadoEn()));
+        }
+        return sb.toString();
     }
 
 
@@ -159,4 +177,9 @@ public class InventarioN {
     }
 
 
+    @Override
+    public String toString() {
+        return String.format("InventarioN{id=%d, bodegaId=%d, precio=%.2f, stock=%d, medicamentoId=%d, creadoEn=%s, actualizadoEn=%s}",
+                id, bodegaId, precio, stock, medicamentoId, creadoEn, actualizadoEn);
+    }
 }
