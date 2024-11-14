@@ -82,7 +82,7 @@ public class ClientesService {
         StringBuilder sb = new StringBuilder();
         String format = "%-5s %-10s %-10s %-15s %-10s %-15s %-10s %-30s %-30s%n";
         sb.append(String.format(format, "ID", "Nombre", "Apellido", "Teléfono", "Género", "Fecha Nac.", "ID Usuario", "Creado En", "Actualizado En"));
-        sb.append("------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        sb.append("------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
         for (ClienteM clienteM : clientesM) {
             sb.append(String.format(format,
                     clienteM.getId(),
