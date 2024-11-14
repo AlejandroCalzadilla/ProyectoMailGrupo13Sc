@@ -143,8 +143,10 @@ public class NotaVentaM {
 
                 for (DetalleNotaVentaM detalle : detalles) {
                     detalle.setIdNotaVenta(notaVenta.getId());
+
                     detalle.crearDetalleNotaVenta();
-                    manejarInventario(detalle);
+
+                    manejarInventario(detalle,notaVenta.getWarehouseId());
                 }
 
                 conn.commit(); // Commit transaction
@@ -183,7 +185,7 @@ public class NotaVentaM {
                     } else {
                         detalle.crearDetalleNotaVenta();
                     }
-                    manejarInventario(detalle);
+                    manejarInventario(detalle,notaVenta.getWarehouseId());
                 }
 
                 conn.commit(); // Commit transaction
@@ -200,33 +202,29 @@ public class NotaVentaM {
     }
 
     // Handle inventory updates
-    private void manejarInventario(DetalleNotaVentaM detalle) throws SQLException {
+    private void manejarInventario(DetalleNotaVentaM detalle,int idalmacen) throws SQLException {
         String sqlSelect = "SELECT id, stock FROM inventory WHERE medicament_id = ? AND warehouse_id = ?";
         String sqlUpdate = "UPDATE inventory SET stock = stock - ? WHERE id = ?";
-        String sqlInsert = "INSERT INTO inventory (medicament_id, warehouse_id, stock, price, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmtSelect = conn.prepareStatement(sqlSelect)) {
             stmtSelect.setInt(1, detalle.getIdMedicamento());
-            stmtSelect.setInt(2, detalle.getIdNotaVenta());
+            stmtSelect.setInt(2, idalmacen);
             ResultSet rs = stmtSelect.executeQuery();
 
             if (rs.next()) {
                 int inventoryId = rs.getInt("id");
                 try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
+
+                    if(rs.getInt("stock")<detalle.getCantidad()){
+                        throw new IllegalArgumentException("No hay suficiente stock para el medicamento con ID: " + detalle.getIdMedicamento());
+                    }
                     stmtUpdate.setInt(1, detalle.getCantidad());
                     stmtUpdate.setInt(2, inventoryId);
                     stmtUpdate.executeUpdate();
+
                 }
             } else {
-                try (PreparedStatement stmtInsert = conn.prepareStatement(sqlInsert)) {
-                    stmtInsert.setInt(1, detalle.getIdMedicamento());
-                    stmtInsert.setInt(2, detalle.getIdNotaVenta());
-                    stmtInsert.setInt(3, -detalle.getCantidad());
-                    stmtInsert.setFloat(4, detalle.getPrecioVenta());
-                    stmtInsert.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
-                    stmtInsert.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
-                    stmtInsert.executeUpdate();
-                }
+                throw new IllegalArgumentException("No hay sufieciente stock para el medicamento con ID: " + detalle.getIdMedicamento());
             }
         }
     }

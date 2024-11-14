@@ -128,8 +128,13 @@ public class NotaCompraM {
     public String crearNotaCompra(NotaCompraM notaCompra, List<DetalleNotaCompraM> detalles) throws SQLException {
         String sqlNota = "INSERT INTO purchase_note (purchase_date, total_amount, supplier_id, warehouse_id, user_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlDetalle = "INSERT INTO purchase_note_details (quantity, purchase_price, percentage, subtotal, purchase_note_id, medicament_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+
         String sqlSelectInventory = "SELECT id, stock FROM inventory WHERE medicament_id = ? AND warehouse_id = ?";
+
         String sqlUpdateInventory = "UPDATE inventory SET stock = stock + ? WHERE id = ?";
+
+
         String sqlInsertInventory = "INSERT INTO inventory (stock, price, medicament_id, warehouse_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
@@ -151,6 +156,12 @@ public class NotaCompraM {
                     notaCompra.setId(generatedKeys.getInt(1));
                 }
             }
+
+
+
+
+
+
 
             // Insert DetalleNotaCompra and update Inventory
             for (DetalleNotaCompraM detalle : detalles) {
