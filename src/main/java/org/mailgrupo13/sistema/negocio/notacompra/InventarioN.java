@@ -79,12 +79,12 @@ public class InventarioN {
     }
 
     // CRUD Methods
-    /*
+
     public List<InventarioN> obtenerInventarios() throws SQLException {
         return mapear(inventarioM.obtenerInventarios());
     }
 
-     */
+
 
 
     /*
@@ -114,7 +114,7 @@ public class InventarioN {
     public boolean eliminarInventario(int id) throws SQLException {
         return inventarioM.eliminarInventario(id);
     }
-
+      */
     private List<InventarioN> mapear(List<InventarioM> inventarioMList) throws SQLException {
         List<InventarioN> inventarioNList = new ArrayList<>();
         for (InventarioM inventarioM : inventarioMList) {
@@ -158,5 +158,5 @@ public class InventarioN {
         }
     }
 
-     */
+
 }

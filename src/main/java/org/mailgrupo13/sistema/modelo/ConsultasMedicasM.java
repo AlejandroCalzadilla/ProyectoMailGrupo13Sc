@@ -359,6 +359,57 @@ public class ConsultasMedicasM {
         return false;
     }
 
+
+    public List<ConsultasMedicasM> leerConsultasPorCliente(int clienteId) throws SQLException {
+        List<ConsultasMedicasM> consultas = new ArrayList<>();
+        String sqlMascotas = "SELECT id FROM pets WHERE customer_id = ?";
+        String sqlConsultas = "SELECT * FROM medical_consultations WHERE pet_id = ?";
+
+        try (PreparedStatement stmtMascotas = conn.prepareStatement(sqlMascotas)) {
+            stmtMascotas.setInt(1, clienteId);
+            ResultSet rsMascotas = stmtMascotas.executeQuery();
+
+            while (rsMascotas.next()) {
+                int petId = rsMascotas.getInt("id");
+
+                try (PreparedStatement stmtConsultas = conn.prepareStatement(sqlConsultas)) {
+                    stmtConsultas.setInt(1, petId);
+                    ResultSet rsConsultas = stmtConsultas.executeQuery();
+
+                    while (rsConsultas.next()) {
+                        ConsultasMedicasM consulta = new ConsultasMedicasM();
+                        consulta.setId(rsConsultas.getInt("id"));
+                        consulta.setFecha(rsConsultas.getDate("date"));
+                        consulta.setMotivo(rsConsultas.getString("reason"));
+                        consulta.setDiagnostico(rsConsultas.getString("diagnosis"));
+                        consulta.setTarifaConsulta(rsConsultas.getFloat("consultation_fee"));
+                        consulta.setPetId(rsConsultas.getInt("pet_id"));
+                        consulta.setUserId(rsConsultas.getInt("user_id"));
+                        consulta.setCreadoEn(rsConsultas.getTimestamp("created_at"));
+                        consulta.setActualizadoEn(rsConsultas.getTimestamp("updated_at"));
+                        consultas.add(consulta);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new IllegalArgumentException("Error al leer las consultas médicas por cliente: " + e.getMessage(), e);
+        }
+        return consultas;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private boolean existeMascota(int petId) {
         String sql = "SELECT COUNT(*) FROM pets WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {

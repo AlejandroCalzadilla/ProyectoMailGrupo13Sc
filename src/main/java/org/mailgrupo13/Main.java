@@ -1,5 +1,6 @@
 package org.mailgrupo13;
 
+import org.mailgrupo13.sistema.modelo.NotaVentaM;
 import org.mailgrupo13.sistema.negocio.almacenes.AlmacenesN;
 import org.mailgrupo13.sistema.negocio.almacenes.MedicamentosN;
 import org.mailgrupo13.sistema.negocio.categorias.CategoriasN;
@@ -10,6 +11,7 @@ import org.mailgrupo13.sistema.negocio.mascotas.EspeciesN;
 import org.mailgrupo13.sistema.negocio.mascotas.MascotasN;
 import org.mailgrupo13.sistema.negocio.mascotas.RazasN;
 import org.mailgrupo13.sistema.negocio.notacompra.DetalleNotaCompraN;
+import org.mailgrupo13.sistema.negocio.notacompra.InventarioN;
 import org.mailgrupo13.sistema.negocio.notacompra.NotaCompraN;
 import org.mailgrupo13.sistema.negocio.notaventa.DetalleNotaVentaN;
 import org.mailgrupo13.sistema.negocio.notaventa.NotaVentaN;
@@ -46,6 +48,10 @@ public class Main {
         HistorialVacunasN historialVacunasN=new HistorialVacunasN();
         NotaCompraN notaCompraN=  new NotaCompraN();
         NotaVentaN notaVentaN=new NotaVentaN();
+        NotaVentaM notaVentaM=new NotaVentaM();
+        InventarioN inventarioN=new InventarioN();
+        //System.out.println(notaVentaM.buscarPorCliente(2));
+
 
         try {
 
@@ -101,6 +107,11 @@ public class Main {
             //System.out.println(cliente.obtenerClientes());
 
 
+            /*pagos */
+
+            //System.out.println(cliente.datospagos(2));
+
+
 
 
 
@@ -116,6 +127,7 @@ public class Main {
             //System.out.println(mascota.eliminarMascota(2));
             //System.out.println(mascota.leerMascota(1));
             //System.out.println(mascota.obtenerMascotas());
+
 
 
 
@@ -231,9 +243,15 @@ public class Main {
             //System.out.println( notaCompraN.actualizarNotaCompra(2,"2022-11-01",2,3,2,detalleNotaCompraNS));
              //System.out.println(notaCompraN.leerNotaCompra(2));
             //System.out.println(notaCompraN.eliminarNotaCompra(3));
-            //System.out.println(notaCompraN.obtenerNotaCompras());
+            System.out.println(notaCompraN.obtenerNotaCompras());
 
 
+
+
+
+            /**inventario */
+
+            System.out.println(inventarioN.obtenerInventarios());
 
 
              /*nota venta */
@@ -241,13 +259,13 @@ public class Main {
 
             float subtotalventas1 = 400;
             float subtotalventas2 = 440;
-            List<DetalleNotaVentaN> detalleNotaVentaNS = new ArrayList<>();
-            detalleNotaVentaNS.add(new DetalleNotaVentaN(2,200,subtotalventas1,2));
-            detalleNotaVentaNS.add(new DetalleNotaVentaN(2,220,subtotalventas2,3));
+            //List<DetalleNotaVentaN> detalleNotaVentaNS = new ArrayList<>();
+            //detalleNotaVentaNS.add(new DetalleNotaVentaN(2,200,subtotalventas1,2));
+           // detalleNotaVentaNS.add(new DetalleNotaVentaN(2,220,subtotalventas2,3));
 
-            System.out.println(notaVentaN.crearNotaVenta( "2023-10-01",2,2,2,detalleNotaVentaNS));
-            System.out.println(notaVentaN.obtenerNotaVentas());
-
+            //System.out.println(notaVentaN.crearNotaVenta( "2023-10-01",2,2,2,detalleNotaVentaNS));
+            //System.out.println(notaVentaN.obtenerNotaVentas());
+            //System.out.println(notaCompraN.);
             //System.out.println(notaVentaN.actualizarNotaVenta(2,"2022-11-01",2,3,2,detalleNotaVentaNS));
 
 

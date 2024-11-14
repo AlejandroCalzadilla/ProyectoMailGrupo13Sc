@@ -1,6 +1,8 @@
 package org.mailgrupo13.sistema.negocio.clientes;
 
 import org.mailgrupo13.sistema.modelo.ClienteM;
+import org.mailgrupo13.sistema.modelo.ConsultasMedicasM;
+import org.mailgrupo13.sistema.modelo.NotaVentaM;
 import org.mailgrupo13.sistema.modelo.UsuariosM;
 
 import java.sql.Date;
@@ -13,7 +15,8 @@ import java.util.List;
 public class ClientesService {
 
     private ClienteM clienteM;
-
+    private NotaVentaM notaVentaM;
+    private ConsultasMedicasM consultasMedicasM;
     public  ClientesService(ClienteM clienteM) {
         this.clienteM = clienteM;
     }
@@ -115,6 +118,54 @@ public class ClientesService {
     }
 
 
+
+    public String obtenerInformacionCliente(int clienteId) throws SQLException {
+        // Retrieve client information
+        ClienteM cliente = clienteM.leerCliente(clienteId);
+        String clienteNombre = cliente.getNombre() + " " + cliente.getApellido();
+        notaVentaM=new NotaVentaM();
+        consultasMedicasM=new ConsultasMedicasM();
+        // Retrieve sales notes
+        List<NotaVentaM> notasVenta = notaVentaM.buscarPorCliente(clienteId);
+          System.out.println(notasVenta + "aver que pax");
+        // Retrieve medical consultations
+        List<ConsultasMedicasM> consultasMedicas = consultasMedicasM.leerConsultasPorCliente(clienteId);
+
+        // Format the results
+        StringBuilder sb = new StringBuilder();
+        sb.append("Cliente: ").append(clienteNombre).append("\n\n");
+
+        // Format sales notes
+        sb.append("Notas de Venta:\n");
+        String notaVentaFormat = "%-5s %-10s %-15s %-10s %-10s%n";
+        sb.append(String.format(notaVentaFormat, "ID", "Fecha", "Monto Total", "Almacen ID", "User ID"));
+        sb.append("------------------------------------------------------------\n");
+        for (NotaVentaM notaVenta : notasVenta) {
+            sb.append(String.format(notaVentaFormat,
+                    notaVenta.getId(),
+                    notaVenta.getFechaVenta(),
+                    notaVenta.getTotalMonto(),
+                    notaVenta.getWarehouseId(),
+                    notaVenta.getUserId()));
+        }
+
+        // Format medical consultations
+        sb.append("\nConsultas Médicas:\n");
+        String consultaMedicaFormat = "%-5s %-10s %-15s %-15s %-10s %-10s%n";
+        sb.append(String.format(consultaMedicaFormat, "ID", "Fecha", "Motivo", "Diagnóstico", "Tarifa", "User ID"));
+        sb.append("--------------------------------------------------------------------------\n");
+        for (ConsultasMedicasM consulta : consultasMedicas) {
+            sb.append(String.format(consultaMedicaFormat,
+                    consulta.getId(),
+                    consulta.getFecha(),
+                    consulta.getMotivo(),
+                    consulta.getDiagnostico(),
+                    consulta.getTarifaConsulta(),
+                    consulta.getUserId()));
+        }
+
+        return sb.toString();
+    }
 
 
 

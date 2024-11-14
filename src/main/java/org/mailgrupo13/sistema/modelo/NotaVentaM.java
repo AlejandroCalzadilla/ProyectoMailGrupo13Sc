@@ -237,6 +237,10 @@ public class NotaVentaM {
         }
     }
 
+
+
+
+
     // Search sales notes by customer ID
     public List<NotaVentaM> buscarPorCliente(int customerId) throws SQLException {
         List<NotaVentaM> notasVenta = new ArrayList<>();
@@ -270,4 +274,9 @@ public class NotaVentaM {
             stmtInventario.executeUpdate();
         }
     }
+
+
+
+
+
 }

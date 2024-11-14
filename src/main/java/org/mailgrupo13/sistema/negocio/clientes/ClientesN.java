@@ -104,6 +104,13 @@ public class ClientesN {
     }
 
 
+    public String datospagos(int id) throws SQLException {
+        return clientesService.obtenerInformacionCliente(id);
+    }
+
+
+
+
     public ClientesN leerCliente(int id ) throws SQLException {
         return clientesService.leerCliente(id);
     }

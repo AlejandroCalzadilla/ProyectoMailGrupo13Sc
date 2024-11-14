@@ -116,18 +116,14 @@ public class InventarioM {
     // Obtener todos los inventarios
     public List<InventarioM> obtenerInventarios() {
         List<InventarioM> inventarios = new ArrayList<>();
-        String sql = "SELECT * FROM inventory";
+        String sql = "SELECT medicament_id, SUM(stock) AS total_stock, AVG(price) AS avg_price FROM inventory GROUP BY medicament_id";
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 InventarioM inventario = new InventarioM();
-                inventario.setId(rs.getInt("id"));
-                inventario.setStock(rs.getInt("stock"));
-                inventario.setPrecio(rs.getFloat("price"));
                 inventario.setMedicamentoId(rs.getInt("medicament_id"));
-                inventario.setBodegaId(rs.getInt("warehouse_id"));
-                inventario.setCreadoEn(rs.getTimestamp("created_at"));
-                inventario.setActualizadoEn(rs.getTimestamp("updated_at"));
+                inventario.setStock(rs.getInt("total_stock"));
+                inventario.setPrecio(rs.getFloat("avg_price"));
                 inventarios.add(inventario);
             }
         } catch (SQLException e) {
