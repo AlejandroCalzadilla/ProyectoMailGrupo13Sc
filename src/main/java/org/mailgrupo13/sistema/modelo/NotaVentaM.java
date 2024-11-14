@@ -349,9 +349,9 @@ public class NotaVentaM {
     public String obtenerVentasPorMes() throws SQLException {
         StringBuilder sb = new StringBuilder();
         String format = "%-10s %-15s%n";
-        sb.append("Ventas por Mes ----------------------\n");
+        sb.append("Ventas por Mes ----------------------\r\n");
         sb.append(String.format(format, "Mes", "Total Ventas"));
-        sb.append("-------------------------------------\n");
+        sb.append("-------------------------------------\r\n");
 
         String sql = "SELECT DATE_TRUNC('month', sale_date) AS month, SUM(total_amount) AS total_sales FROM sales_notes GROUP BY month ORDER BY month";
         try (PreparedStatement stmt = conn.prepareStatement(sql);
@@ -367,9 +367,9 @@ public class NotaVentaM {
     public String obtenerVentasPorCliente() throws SQLException {
         StringBuilder sb = new StringBuilder();
         String format = "%-15s %-15s%n";
-        sb.append("Ventas por Cliente ------------------\n");
+        sb.append("Ventas por Cliente ------------------\r\n");
         sb.append(String.format(format, "Cliente ID", "Total Ventas"));
-        sb.append("-------------------------------------\n");
+        sb.append("-------------------------------------\r\n");
 
         String sql = "SELECT customer_id, COUNT(*) AS total_sales FROM sales_notes GROUP BY customer_id ORDER BY total_sales DESC";
         try (PreparedStatement stmt = conn.prepareStatement(sql);
@@ -380,6 +380,7 @@ public class NotaVentaM {
         }
         return sb.toString();
     }
+
 
 
 

@@ -259,12 +259,12 @@ public class Main {
 
             float subtotalventas1 = 400;
             float subtotalventas2 = 440;
-            List<DetalleNotaVentaN> detalleNotaVentaNS = new ArrayList<>();
-            detalleNotaVentaNS.add(new DetalleNotaVentaN(2,200,subtotalventas1,2));
-            detalleNotaVentaNS.add(new DetalleNotaVentaN(2,220,subtotalventas2,3));
+            //List<DetalleNotaVentaN> detalleNotaVentaNS = new ArrayList<>();
+            //detalleNotaVentaNS.add(new DetalleNotaVentaN(2,200,subtotalventas1,2));
+            //detalleNotaVentaNS.add(new DetalleNotaVentaN(2,220,subtotalventas2,3));
 
-            System.out.println(notaVentaN.crearNotaVenta( "2023-10-01",2,2,2,detalleNotaVentaNS));
-            System.out.println(notaVentaN.obtenerNotaVentas());
+            //System.out.println(notaVentaN.crearNotaVenta( "2024-11-13", 3, 5, 2, detalleNotaVentaNS));
+            //System.out.println(notaVentaN.obtenerNotaVentas());
             //System.out.println(notaCompraN.);
             //System.out.println(notaVentaN.actualizarNotaVenta(2,"2022-11-01",2,3,2,detalleNotaVentaNS));
 
@@ -274,7 +274,7 @@ public class Main {
 
 
                  //cantidad de comprasPorMes
-                //estadisticaN.obtenerComprasPorMes();
+                System.out.println(estadisticaN.obtenerComprasPorMes());
 
                 //cantidad de comprasPorProveedor
                 //estadisticaN.obtenerComprasPorProveedor();
@@ -285,7 +285,7 @@ public class Main {
 
 
                 //cantidad de ventasPorMes
-                //estadisticaN.obtenerVentasPorMes();
+                System.out.println(estadisticaN.obtenerVentasPorMes());
 
 
 

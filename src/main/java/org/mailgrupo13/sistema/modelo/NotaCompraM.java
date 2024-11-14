@@ -386,9 +386,9 @@ public class NotaCompraM {
     public String obtenerComprasPorMes() throws SQLException {
         StringBuilder sb = new StringBuilder();
         String format = "%-10s %-15s%n";
-        sb.append("Compras por Mes ---------------------\n");
+        sb.append("Compras por Mes ---------------------\r\n");
         sb.append(String.format(format, "Mes", "Total Compras"));
-        sb.append("-------------------------------------\n");
+        sb.append("-------------------------------------\r\n");
 
         String sql = "SELECT DATE_TRUNC('month', purchase_date) AS month, SUM(total_amount) AS total_purchases FROM purchase_note GROUP BY month ORDER BY month";
         try (PreparedStatement stmt = conn.prepareStatement(sql);
@@ -404,9 +404,9 @@ public class NotaCompraM {
     public String obtenerComprasPorProveedor() throws SQLException {
         StringBuilder sb = new StringBuilder();
         String format = "%-15s %-15s%n";
-        sb.append("Compras por Proveedor ---------------\n");
+        sb.append("Compras por Proveedor ---------------\r\n");
         sb.append(String.format(format, "Proveedor ID", "Total Compras"));
-        sb.append("-------------------------------------\n");
+        sb.append("-------------------------------------\r\n");
 
         String sql = "SELECT supplier_id, COUNT(*) AS total_purchases FROM purchase_note GROUP BY supplier_id ORDER BY total_purchases DESC";
         try (PreparedStatement stmt = conn.prepareStatement(sql);

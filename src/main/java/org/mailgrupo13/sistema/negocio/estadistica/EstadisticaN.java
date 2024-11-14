@@ -27,7 +27,7 @@ public class EstadisticaN {
 
 
         public String obtenerComprasPorMes() throws SQLException {
-            return notaCompraM.obtenerNotasCompra().toString();
+            return notaCompraM.obtenerComprasPorMes();
         }
 
 
