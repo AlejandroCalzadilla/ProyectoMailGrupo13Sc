@@ -28,8 +28,8 @@ public class NotaVentaService {
         List<NotaVentaM> notaVentas = notaVentaM.obtenerNotasVenta();
         StringBuilder sb = new StringBuilder();
         String notaVentaFormat = "%-5s %-10s %-15s %-15s %-10s %-10s %-10s  %-30s%n";
-        sb.append("NotaVenta:\n");
-        sb.append(String.format(notaVentaFormat, "ID", "Fecha", "Monto Total", "Warehouse ID", "User ID", "Customer ID", "Creado En", "Actualizado En"));
+        sb.append("NotaVenta:\r\n");
+        sb.append(String.format(notaVentaFormat, "ID", "Fecha", "Monto Total", "Warehouse ID", "User ID", "Customer ID", "Creado En", "Actualizado En\r\n"));
         sb.append("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
         for (NotaVentaM notaVenta : notaVentas) {
             sb.append(String.format(notaVentaFormat,

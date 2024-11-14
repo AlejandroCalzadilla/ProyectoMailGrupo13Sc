@@ -671,7 +671,7 @@ public class ComandoEmail {
         sb.append("-----------------------------------------------------------------------------------------------------\r\n");
         sb.append("CREAR NOTA DE COMPRA:\r\n");
         sb.append("Parámetros: fecha, id_almacen, id_usuario (que registra la venta), id_cliente, cantidad_detalle_1,\r\n" +
-                "precio_venta_detalle_1, subtotal_detalle_1, id_medicamento_detalle1,..., cantidad_detalle_n, precio_venta_detalle_n, subtotal_detalle_n, id_medicamento_detalle_n\r\n");
+                "precio_compra_detalle_1, porcent_ganancia_detalle_1, id_medicamento_detalle1,..., cantidad_detalle_n, precio_venta_detalle_n, porcent_ganancia_detalle_n, id_medicamento_detalle_n\r\n");
         sb.append("los detalles las notas son: cantida, precio de venta, subtotal, id_medicamento\r\n");
         sb.append("Ejemplo:\r\n");
         sb.append("CREATENOTASCOMPRAS[2024-11-13, 2, 3, 2, 2, 200, 50, 400,2]\r\n");

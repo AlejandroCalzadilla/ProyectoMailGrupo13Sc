@@ -216,7 +216,8 @@ public class NotaVentaM {
                 try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
 
                     if(rs.getInt("stock")<detalle.getCantidad()){
-                        throw new IllegalArgumentException("No hay suficiente stock para el medicamento con ID: " + detalle.getIdMedicamento());
+                        throw new IllegalArgumentException("No hay suficiente stock para el medicamento con ID: " +
+                                detalle.getIdMedicamento() + " en el almacen con ID: " + idalmacen);
                     }
                     stmtUpdate.setInt(1, detalle.getCantidad());
                     stmtUpdate.setInt(2, inventoryId);
@@ -224,7 +225,8 @@ public class NotaVentaM {
 
                 }
             } else {
-                throw new IllegalArgumentException("No hay sufieciente stock para el medicamento con ID: " + detalle.getIdMedicamento());
+                throw new IllegalArgumentException("No hay sufieciente stock para el medicamento con ID: " +
+                        detalle.getIdMedicamento() + " en el almacen con ID: " + idalmacen);
             }
         }
     }
