@@ -57,7 +57,7 @@ public class CategoriaService {
         String format = "%-5s %-30s %-30s %-30s%n";
         sb.append("Categoria Lista ---------------------- ");
         sb.append(String.format(format, "ID", "Nombre", "Creado En", "Actualizado En"));
-        sb.append("---------------------------------------------------------------------------\n");
+        sb.append("---------------------------------------------------------------------------\r\n");
         for (CategoriasM especieM : especiesM) {
             sb.append(String.format(format,
                     especieM.getId(),

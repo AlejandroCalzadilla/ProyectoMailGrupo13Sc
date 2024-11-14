@@ -64,7 +64,7 @@ public class VacunasN {
         StringBuilder sb = new StringBuilder();
         String format = "%-5s %-20s %-15s %-30s %-30s %-30s%n";
         sb.append(String.format(format, "ID", "Vacuna", "Duración (días)", "Notas", "Creado En", "Actualizado En"));
-        sb.append("------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        sb.append("------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
         for (VacunasM vacunasM : vacunasMList) {
             sb.append(String.format(format,
                     vacunasM.getId(),

@@ -62,7 +62,7 @@ public class AlmacenesService {
         StringBuilder sb = new StringBuilder();
         String format = "%-5s %-10s %-30s  %-30s%n";
         sb.append(String.format(format, "ID", "Nombre", "Ubicacion", "Descpripcion"));
-        sb.append("---------------------------------------------------------------------------\n");
+        sb.append("---------------------------------------------------------------------------\r\n");
         for (AlmacenesM almacenM : almacenesM) {
             sb.append(String.format(format,
                     almacenM.getId(),

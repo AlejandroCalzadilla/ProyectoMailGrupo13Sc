@@ -204,7 +204,7 @@ public class ConsultasServices {
         String format = "%-5s %-10s %-20s %-20s %-15s %-10s %-10s  %-30s %-30s%n";
 
         sb.append(String.format(format, "ID", "Fecha", "Motivo", "Diagnóstico", "Tarifa", "Pet ID", "User ID", "Creado En", "Actualizado En"));
-        sb.append("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        sb.append("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
         for (ConsultasMedicasM consulta : consultasMedicasMList) {
             sb.append(String.format(format,
                     consulta.getId(),

@@ -107,7 +107,7 @@ public class RazasN {
         StringBuilder sb = new StringBuilder();
         String format = "%-5s %-20s %-10s  %-20s %-30s %-30s%n";
         sb.append(String.format(format, "ID", "Nombre", "ID Especie","especie" ,  "Creado En", "Actualizado En"));
-        sb.append("--------------------------------------------------------------------------------------------\n");
+        sb.append("--------------------------------------------------------------------------------------------\r\n");
         for (RazasM razasM : razasMList) {
             sb.append(String.format(format,
                     razasM.getId(),

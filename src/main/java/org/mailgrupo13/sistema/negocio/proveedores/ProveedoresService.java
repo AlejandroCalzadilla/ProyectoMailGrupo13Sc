@@ -69,7 +69,7 @@ public class ProveedoresService {
         StringBuilder sb = new StringBuilder();
         String format = "%-5s %-20s %-15s %-15s %-30s %-30s %-30s %-30s%n";
         sb.append(String.format(format, "ID", "Nombre", "Pais", "Telefono", "Email", "Direccion", "Creado En", "Actualizado En"));
-        sb.append("------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        sb.append("------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
         for (ProveedoresM proveedoresM : proveedoresMList) {
             sb.append(String.format(format,
                     proveedoresM.getId(),

@@ -56,7 +56,7 @@ public class MedicamentosService {
         StringBuilder sb = new StringBuilder();
         String format = "%-5s %-10s %-10s %-15s %-15s %-10s %-10s %-30s %-30s%n";
         sb.append(String.format(format, "ID", "Nombre", "Dosis", "Fabricante", "Fecha Caducidad", "Sustancia Controlada", "Categoria ID", "Creado En", "Actualizado En"));
-        sb.append("------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        sb.append("------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
         for (MedicamentosM medicamentoM : medicamentosM) {
             sb.append(String.format(format,
                     medicamentoM.getId(),

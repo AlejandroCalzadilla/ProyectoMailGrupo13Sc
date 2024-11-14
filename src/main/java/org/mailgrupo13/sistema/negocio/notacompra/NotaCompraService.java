@@ -29,7 +29,7 @@ public class NotaCompraService {
         String notaCompraFormat = "%-5s %-10s %-15s %-15s %-10s %-10s %-10s  %-30s%n";
         sb.append("NotaCompra:\n");
         sb.append(String.format(notaCompraFormat, "ID", "Fecha", "Monto Total", "Proveedor ID", "Almacen ID", "User ID", "Creado En", "Actualizado En"));
-        sb.append("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        sb.append("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
         for (NotaCompraM notaCompra : notaCompras) {
             sb.append(String.format(notaCompraFormat,
                     notaCompra.getId(),

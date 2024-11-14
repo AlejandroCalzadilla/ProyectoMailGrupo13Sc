@@ -64,7 +64,7 @@ public class EspeciesService {
         StringBuilder sb = new StringBuilder();
         String format = "%-5s %-10s %-30s %-30s%n";
         sb.append(String.format(format, "ID", "Nombre", "Creado En", "Actualizado En"));
-        sb.append("---------------------------------------------------------------------------\n");
+        sb.append("---------------------------------------------------------------------------\r\n");
         for (EspeciesM especieM : especiesM) {
             sb.append(String.format(format,
                     especieM.getId(),

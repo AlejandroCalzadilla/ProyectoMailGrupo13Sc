@@ -49,7 +49,7 @@ public class UsuariosService {
         StringBuilder sb = new StringBuilder();
         String format = "%-5s %-20s %-20s  %-30s%n";
         sb.append(String.format(format, "ID", "Email", "Password", "Nombre"));
-        sb.append("------------------------------------------------------------------------------------------------------------\n");
+        sb.append("------------------------------------------------------------------------------------------------------------\r\n");
         for (UsuariosM usuariosM : usuariosMList) {
             sb.append(String.format(format,
                     usuariosM.getId(),
