@@ -84,7 +84,7 @@ public class MascotasService {
     public String mapeard(List<MascotasM> mascotasMList) throws SQLException {
         StringBuilder sb = new StringBuilder();
         String format = "%-5s %-10s %-10s %-10s %-15s %-30s %-10s %-10s %-30s %-30s%n";
-        sb.append("LISTA DE MASCOTAS");
+        sb.append("LISTA DE MASCOTAS\r\n");
         sb.append(String.format(format, "ID", "Nombre", "Peso", "Color", "Fecha Nac.", "URL Foto", "ID Cliente", "ID Raza", "Creado En", "Actualizado En"));
         sb.append("------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
         for (MascotasM mascotaM : mascotasMList) {

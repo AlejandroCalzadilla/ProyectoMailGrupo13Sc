@@ -95,6 +95,23 @@ public class ServicioEmail {
     }
 
     private String extraerSubject(String correo) {
+        StringBuilder subjectBuilder = new StringBuilder();
+        boolean subjectFound = false;
+
+        for (String line : correo.split("\n")) {
+            if (line.startsWith("Subject:")) {
+                subjectBuilder.append(line.substring(9).trim());
+                subjectFound = true;
+            } else if (subjectFound && (line.startsWith(" ") || line.startsWith("\t"))) {
+                subjectBuilder.append(" ").append(line.trim());
+            } else if (subjectFound) {
+                break;
+            }
+        }
+        return subjectBuilder.toString();
+    }
+
+    private String extraerSubjectOld(String correo) {
         for (String line : correo.split("\n")) {
             if (line.startsWith("Subject:")) {
                 return line.substring(9).trim();
